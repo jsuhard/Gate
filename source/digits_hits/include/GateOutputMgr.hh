@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #ifndef GateOutputMgr_H
@@ -11,27 +11,29 @@
 
 #include "globals.hh"
 
-#include "G4Run.hh"
-#include "G4Step.hh"
-#include "G4Event.hh"
 #include "G4Timer.hh"
-#include "G4UserSteppingAction.hh"
-
 #include "GateConfiguration.h"
-#include "GateRecorderBase.hh"
 #include "GateVOutputModule.hh"
 #include "GateCrystalHit.hh"
 #include "GatePhantomHit.hh"
 #include "GateSingleDigi.hh"
 #include "GateCoincidenceDigi.hh"
 
+class G4Run;
+class G4Step;
+class G4Event;
+class G4Timer;
+class G4UserSteppingAction;
+
 class GateOutputMgrMessenger;
 class GateVVolume;
 class GateSteppingAction;
+class GateVGeometryVoxelStore;
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
 
-class GateOutputMgr :  public GateRecorderBase
+class GateOutputMgr
 {
 public:
 

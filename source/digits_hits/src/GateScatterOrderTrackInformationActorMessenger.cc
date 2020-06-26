@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 #include "GateConfiguration.h"
@@ -31,7 +31,10 @@ void GateScatterOrderTrackInformationActorMessenger::BuildCommands(G4String){}
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
-void GateScatterOrderTrackInformationActorMessenger::SetNewValue(G4UIcommand*, G4String){}
+void GateScatterOrderTrackInformationActorMessenger::SetNewValue(G4UIcommand* command, G4String param)
+{
+  GateActorMessenger::SetNewValue(command, param);
+}
 //-----------------------------------------------------------------------------
 
 #endif /* end #define GATESCATTERORDERTRACKINFORMATIONACTORMESSENGER_CC */

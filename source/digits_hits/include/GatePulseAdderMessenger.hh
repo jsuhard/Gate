@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -35,12 +35,14 @@ class GatePulseAdderMessenger: public GatePulseProcessorMessenger
 {
   public:
     GatePulseAdderMessenger(GatePulseAdder* itsPulseAdder);
-    inline ~GatePulseAdderMessenger() {}
+    ~GatePulseAdderMessenger();
 
     void SetNewValue(G4UIcommand* aCommand, G4String aString);
 
     inline GatePulseAdder* GetPulseAdder()
       { return (GatePulseAdder*) GetPulseProcessor(); }
+private:
+     G4UIcmdWithAString          *positionPolicyCmd;
 
 };
 

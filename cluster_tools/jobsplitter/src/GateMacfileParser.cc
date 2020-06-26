@@ -12,12 +12,25 @@ See GATE/LICENSE.txt for further details
 #include "GateMacfileParser.hh"
 #include <time.h>
 
+#include <iostream> 
+#include <sstream> 
+
+// for log
+#include <cmath>
+// for getenv() and system()
+#include <cstdlib>
+
+using namespace std;
+
+// These were included by I don't know why.
+// #include <sys/types.h>
+// #include <sys/stat.h>
+
 GateMacfileParser::GateMacfileParser(G4String macfileName,G4int numberOfSplits,G4int numberOfAliases,G4String* aliasesPtr)
 {
 	macName=macfileName;
 	nSplits=numberOfSplits;
 	nAliases=numberOfAliases;
-	aliases=aliasesPtr;
 	timeUnit=" -1 ";
 	timeStart=-1.;
 	timeStop=-1.;
@@ -26,8 +39,8 @@ GateMacfileParser::GateMacfileParser(G4String macfileName,G4int numberOfSplits,G
 	addSliceBool = false;
 	readSliceBool = false;
 	lambda=-1;
-	usedAliases = new bool[nAliases];
-	for(int i=0;i<nAliases;i++)usedAliases[i]=false;
+	for(int i=0;i<nAliases;i++)listOfUsedAliases.push_back(false);
+	for(int i=0;i<nAliases;i++)	listOfAliases.push_back(aliasesPtr[i]);
 	oldSplitNumber=-1;
 
 	//root,ascii are enabled by default but we skeep that in cluster mode
@@ -38,7 +51,7 @@ GateMacfileParser::GateMacfileParser(G4String macfileName,G4int numberOfSplits,G
 	PWD=getenv("PWD");
 
 	// For the random engine's seeds
-	srand(time(NULL)*getpid());
+        srand(time(NULL)/**getpid()*/);
 }
 
 GateMacfileParser::~GateMacfileParser()
@@ -94,6 +107,9 @@ G4int GateMacfileParser::GenerateResolvedMacros(G4String directory)
 		i_str<<j;
 		GenerateResolvedMacro(dir+macNameDir+i_str.str()+".mac",j,splitfile); 
 		splitfile<<endl;  
+
+		if(j%(nSplits/10)==0)
+			cout<<100*j/nSplits<<"% "<<flush;
 	}
 	if (filenames[ROOT]==1)
 		splitfile<<"Original Root filename: "<<originalRootFileName<<endl;
@@ -155,6 +171,7 @@ G4int GateMacfileParser::GenerateResolvedMacro(G4String outputName,G4int splitNu
 		{
 			FormatMacline();
 			InsertAliases();
+			AddAliases();
 			LookForEnableOutput();
 			InsertOutputFileNames(splitNumber,splitfile);
 			SearchForActors(splitNumber,outputMacfile,splitfile);
@@ -188,12 +205,13 @@ G4int GateMacfileParser::GenerateResolvedMacro(G4String outputName,G4int splitNu
 		if (enabledOutput+listOfEnabledActorName.size()==0) G4cerr << "***** Warning: No output module nor actor are enabled !" << endl;
 		// Check if all aliases from the command line are used
 		bool flag=true;
-		for (G4int i=1;i<nAliases;i+=2) flag&=usedAliases[i];
+		nAliases = (G4int)listOfUsedAliases.size();
+		for (G4int i=1;i<nAliases;i+=2) flag&=listOfUsedAliases[i];
 		if(flag==false)
 		{
 			G4cerr<<"Could not use the following aliases from the command line:"<<G4endl;
 			for (G4int i=1;i<nAliases;i+=2) 
-				if(!usedAliases[i]) G4cout<<" "<<aliases[i]<<G4endl;
+				if(!listOfUsedAliases[i]) G4cout<<" "<<listOfAliases[i]<<G4endl;
 			return 1; 
 		}
 	}
@@ -205,16 +223,38 @@ G4int GateMacfileParser::GenerateResolvedMacro(G4String outputName,G4int splitNu
 void GateMacfileParser::InsertAliases()
 {
 	G4String insert;
+	nAliases = (G4int)(listOfAliases.size());
 	for (G4int i=1;i<nAliases;i+=2)
 	{
-		if (macline.contains("{"+aliases[i]+"}"))
+		while (macline.contains("{"+listOfAliases[i]+"}"))
 		{
-			insert=aliases[i-1];
-			G4int position=macline.find("{"+aliases[i]+"}",0);
-			G4int length=2+aliases[i].size();
+			insert=listOfAliases[i-1];
+			G4int position=macline.find("{"+listOfAliases[i]+"}",0);
+			G4int length=2+listOfAliases[i].size();
 			macline.replace(position,length,insert);
-			usedAliases[i]=true;
+			listOfUsedAliases[i]=true;
 		}
+	}
+}
+
+void GateMacfileParser::AddAliases()
+{
+	if (macline.contains("/control/alias"))
+	{
+		G4String tmpStr = macline.substr(15,256);
+		int position = tmpStr.find(" ");
+
+		G4String aliasName(tmpStr.substr(0,position));
+		for(size_t i=1;i<listOfAliases.size();i+=2)
+			if(aliasName==listOfAliases[i])
+				return;
+
+		listOfAliases.push_back( tmpStr.substr(position+1,tmpStr.size()-position));
+		listOfUsedAliases.push_back(false);
+		nAliases++;
+		listOfAliases.push_back( tmpStr.substr(0,position));
+		listOfUsedAliases.push_back(false);
+		nAliases++;
 	}
 }
 
@@ -247,6 +287,7 @@ void GateMacfileParser::InsertSubMacros(ofstream& output,G4int splitNumber,ofstr
 			{
 				FormatMacline();
 				InsertAliases();
+				AddAliases();
 				LookForEnableOutput();
 				InsertOutputFileNames(splitNumber,splitfile);
 				SearchForActors(splitNumber,output,splitfile);
@@ -343,6 +384,7 @@ void GateMacfileParser::DealWithTimeCommands(ofstream& output,G4int splitNumber,
 		G4int position=subMacline.find(" ",0);
 		G4String timeStart_str=subMacline.substr(0,position);
 		G4String timeUnit_tmp=subMacline.substr(position+1,subMacline.length());
+//	G4cout<< macline<<" :star= " << timeStart_str<< " :unit="<< timeUnit_tmp<< ":"<<timeUnit <<G4endl;
                 if (timeUnit==" -1 ") timeUnit=timeUnit_tmp;
                 else if (timeUnit!=timeUnit_tmp)
                 {
@@ -446,7 +488,7 @@ void GateMacfileParser::DealWithTimeCommands(ofstream& output,G4int splitNumber,
                 }
 		G4String filename = macline.substr(35);
 		// Opening file
-		std::ifstream is;
+		ifstream is;
 		is.open(filename.c_str());
 		if (!is)
 		{
@@ -933,6 +975,13 @@ void GateMacfileParser::FormatMacline()
 		macline=temp;
 	}
 
+	//remove "\t"
+        while (macline.contains("\t"))
+        {
+               position = macline.find("\t");
+               macline.replace(position,1," ");
+        }
+	
 	//remove trailing spaces
 	size=macline.length();
 	subString=macline(size-1);
@@ -1014,7 +1063,7 @@ bool GateMacfileParser::TreatOutputStream(G4String key, G4String def, G4String& 
 }
 
 /// Misc functions
-void GateMacfileParser::skipComment(std::istream & is)
+void GateMacfileParser::skipComment(istream & is)
 {
   char c;
   char line[1024];
@@ -1028,10 +1077,10 @@ void GateMacfileParser::skipComment(std::istream & is)
   is.unget();
 }
 
-bool GateMacfileParser::ReadColNameAndUnit(std::istream & is, std::string name, string & unit) {
+bool GateMacfileParser::ReadColNameAndUnit(istream & is, string name, string & unit) {
   skipComment(is);
   // Read name
-  std::string s;
+  string s;
   is >> s;
   if (s != name) {
     for(unsigned int i=0; i<s.size(); i++) is.unget();

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 #include "GatePETVRTSettings.hh"
@@ -11,6 +11,7 @@ See GATE/LICENSE.txt for further details
 #include "GateTotalDiscreteProcess.hh"
 #include "G4ios.hh"
 #include "GatePhantomSD.hh"
+#include "GateMessageManager.hh"
 
 GatePETVRTSettings::GatePETVRTSettings()
 {
@@ -52,7 +53,7 @@ void GatePETVRTSettings::SetFictitiousEnergy ( G4double en )
 
 		if (m_nVerbosityLevel>=Verbose)
 		{
-			G4cout << "GatePETVRTSettings::SetFictitiousEnergy: Set to "<< m_nFictitiousEnergy << G4endl;
+			G4cout << "GatePETVRTSettings::SetFictitiousEnergy: Set to "<< m_nFictitiousEnergy << Gateendl;
 		}
 	}
 }
@@ -65,7 +66,7 @@ void GatePETVRTSettings::SetDiscardEnergy ( G4double en )
 	
 		if (m_nVerbosityLevel>=Verbose)
 		{
-			G4cout << "GatePETVRTSettings::SetDiscardEnergy: Set to "<< m_nDiscardEnergy << G4endl;
+			G4cout << "GatePETVRTSettings::SetDiscardEnergy: Set to "<< m_nDiscardEnergy << Gateendl;
 		}
 	}
 }

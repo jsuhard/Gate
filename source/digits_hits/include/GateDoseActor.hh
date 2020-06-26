@@ -1,38 +1,41 @@
 /*----------------------
-   Copyright (C): OpenGATE Collaboration
+  Copyright (C): OpenGATE Collaboration
 
-This software is distributed under the terms
-of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
-----------------------*/
+  This software is distributed under the terms
+  of the GNU Lesser General  Public Licence (LGPL)
+  See LICENSE.md for further details
+  ----------------------*/
 
 
 /*!
   \class  GateDoseActor
   \author thibault.frisson@creatis.insa-lyon.fr
-          laurent.guigues@creatis.insa-lyon.fr
-	  david.sarrut@creatis.insa-lyon.fr
+  laurent.guigues@creatis.insa-lyon.fr
+  david.sarrut@creatis.insa-lyon.fr
 
-	  DoseToWater option added by Loïc Grevillot
-  \date	March 2011
- */
+  - DoseToWater option added by Loïc Grevillot
+  - Dose calculation in inhomogeneous volume added by Thomas Deschler (thomas.deschler@iphc.cnrs.fr)
+  - Dose in Regions (Maxime Chauvin, David Sarrut)
+*/
+
 
 #ifndef GATEDOSEACTOR_HH
 #define GATEDOSEACTOR_HH
 
 #include <G4NistManager.hh>
-
+#include <G4UnitsTable.hh>
 #include "GateVImageActor.hh"
 #include "GateActorManager.hh"
-#include "G4UnitsTable.hh"
 #include "GateDoseActorMessenger.hh"
 #include "GateImageWithStatistic.hh"
+#include "GateVoxelizedMass.hh"
+#include "GateRegionDoseStat.hh"
 
 class G4EmCalculator;
 
 class GateDoseActor : public GateVImageActor
 {
- public:
+public:
 
   //-----------------------------------------------------------------------------
   // Actor name
@@ -43,29 +46,43 @@ class GateDoseActor : public GateVImageActor
   //-----------------------------------------------------------------------------
   // Constructs the sensor
   virtual void Construct();
-
+  //Edep
   void EnableEdepImage(bool b) { mIsEdepImageEnabled = b; }
   void EnableEdepSquaredImage(bool b) { mIsEdepSquaredImageEnabled = b; }
   void EnableEdepUncertaintyImage(bool b) { mIsEdepUncertaintyImageEnabled = b; }
+  //Dose
   void EnableDoseImage(bool b) { mIsDoseImageEnabled = b; }
   void EnableDoseSquaredImage(bool b) { mIsDoseSquaredImageEnabled = b; }
   void EnableDoseUncertaintyImage(bool b) { mIsDoseUncertaintyImageEnabled = b; }
+  void EnableDoseNormalisationToMax(bool b);
+  void EnableDoseNormalisationToIntegral(bool b);
+  void SetEfficiencyFile(G4String b);
+  void SetEfficiencyFileByZ(G4String b);
+  //DoseToWater
   void EnableDoseToWaterImage(bool b) { mIsDoseToWaterImageEnabled = b; }
   void EnableDoseToWaterSquaredImage(bool b) { mIsDoseToWaterSquaredImageEnabled = b; }
   void EnableDoseToWaterUncertaintyImage(bool b) { mIsDoseToWaterUncertaintyImageEnabled = b; }
+  void EnableDoseToWaterNormalisationToMax(bool b);
+  void EnableDoseToWaterNormalisationToIntegral(bool b);
+  //DoseToOtherMaterial
+  void EnableDoseToOtherMaterialImage(bool b) { mIsDoseToOtherMaterialImageEnabled = b; }
+  void EnableDoseToOtherMaterialSquaredImage(bool b) { mIsDoseToOtherMaterialSquaredImageEnabled = b; }
+  void EnableDoseToOtherMaterialUncertaintyImage(bool b) { mIsDoseToOtherMaterialUncertaintyImageEnabled = b; }
+  void EnableDoseToOtherMaterialNormalisationToMax(bool b);
+  void EnableDoseToOtherMaterialNormalisationToIntegral(bool b);
+  void SetOtherMaterial(G4String b) { mOtherMaterial = b; }
+  //Others
   void EnableNumberOfHitsImage(bool b) { mIsNumberOfHitsImageEnabled = b; }
-  void EnableDoseNormalisationToMax(bool b);
-  void EnableDoseNormalisationToIntegral(bool b);
-  void EnableDoseToWaterNormalisation(bool b) { mIsDoseToWaterNormalisationEnabled = b; mDoseToWaterImage.SetScaleFactor(1.0); }
-
-  void EnableRBE1AlphaImage(bool b) { mIsRBE1AlphaImageEnabled = b; }
-  void EnableRBE1BetaImage(bool b) { mIsRBE1BetaImageEnabled = b; }
-  void EnableRBE1FactorImage(bool b) { mIsRBE1FactorImageEnabled = b; }
-  void EnableRBE1BioDoseImage(bool b) { mIsRBE1BioDoseImageEnabled = b; }
-  void EnableRBE1Test1(bool b) { mIsRBE1Test1Enabled = b; }
-
-  void SetRBE1AlphaDataFilename(G4String f) { mRBE1AlphaDataFilename = f; }
-  void SetRBE1BetaDataFilename(G4String f) { mRBE1BetaDataFilename = f; }
+  void SetDoseAlgorithmType(G4String b) { mDoseAlgorithmType = b; }
+  void ImportMassImage(G4String b) { mImportMassImage = b; }
+  void ExportMassImage(G4String b) { mExportMassImage = b; }
+  void VolumeFilter(G4String b) { mVolumeFilter = b; }
+  void MaterialFilter(G4String b) { mMaterialFilter = b; }
+  void setTestFlag(bool b) { mTestFlag = b; }
+  //Regions
+  void SetDoseByRegionsInputFilename(std::string f);
+  void SetDoseByRegionsOutputFilename(std::string f);
+  void AddRegion(std::string str);
 
   virtual void BeginOfRunAction(const G4Run*r);
   virtual void BeginOfEventAction(const G4Event * event);
@@ -74,73 +91,95 @@ class GateDoseActor : public GateVImageActor
   virtual void UserPreTrackActionInVoxel(const int /*index*/, const G4Track* track);
   virtual void UserPostTrackActionInVoxel(const int /*index*/, const G4Track* /*t*/) {}
 
-  /// Saves the data collected to the file
+  //  Saves the data collected to the file
   virtual void SaveData();
   virtual void ResetData();
 
-  ///Scorer related
-  //virtual G4bool ProcessHits(G4Step *, G4TouchableHistory*);
+  // Scorer related
   virtual void Initialize(G4HCofThisEvent*){}
   virtual void EndOfEvent(G4HCofThisEvent*){}
 
-  void ReadRBE1AlphaBetaFromFile(G4String filenameAlpha, G4String filenameBeta);
-  void GetRBE1AlphaBetaFromLet(G4double let, G4double & alpha, G4double & beta);
-  void ComputeRBE1ImageAndSave();
-
 protected:
   GateDoseActor(G4String name, G4int depth=0);
-  GateDoseActorMessenger * pMessenger;
+  GateDoseActorMessenger* pMessenger;
+  GateVoxelizedMass mVoxelizedMass;
 
   int mCurrentEvent;
   StepHitType mUserStepHitType;
 
   bool mIsLastHitEventImageEnabled;
+
+  //Edep
   bool mIsEdepImageEnabled;
   bool mIsEdepSquaredImageEnabled;
   bool mIsEdepUncertaintyImageEnabled;
+  //Dose
   bool mIsDoseImageEnabled;
   bool mIsDoseSquaredImageEnabled;
   bool mIsDoseUncertaintyImageEnabled;
+  bool mIsDoseNormalisationEnabled;
+  bool mIsDoseEfficiencyEnabled;
+  bool mIsDoseEfficiencyByZEnabled;
+  //DoseToWater
   bool mIsDoseToWaterImageEnabled;
   bool mIsDoseToWaterSquaredImageEnabled;
   bool mIsDoseToWaterUncertaintyImageEnabled;
-  bool mIsNumberOfHitsImageEnabled;
-  bool mIsDoseNormalisationEnabled;
   bool mIsDoseToWaterNormalisationEnabled;
-  bool mIsRBE1AlphaImageEnabled;
-  bool mIsRBE1BetaImageEnabled;
-  bool mIsRBE1FactorImageEnabled;
-  bool mIsRBE1BioDoseImageEnabled;
-  bool mIsRBE1Enabled;
-  bool mIsRBE1Test1Enabled;
+  bool mDose2WaterWarningFlag;
+  //DoseToOtherMaterial
+  bool mIsDoseToOtherMaterialImageEnabled;
+  bool mIsDoseToOtherMaterialSquaredImageEnabled;
+  bool mIsDoseToOtherMaterialUncertaintyImageEnabled;
+  bool mIsDoseToOtherMaterialNormalisationEnabled;
+  //Others
+  bool mIsNumberOfHitsImageEnabled;
+  bool mTestFlag;
 
-  GateImageWithStatistic mEdepImage;
-  GateImageWithStatistic mDoseImage;
-  GateImageWithStatistic mDoseToWaterImage;
-  GateImage mNumberOfHitsImage;
-  GateImage mLastHitEventImage;
-  GateImageWithStatistic mRBE1AlphaImage;
-  GateImageWithStatistic mRBE1BetaImage;
-  GateImageWithStatistic mRBE1FactorImage;
-  GateImageWithStatistic mRBE1BioDoseImage;
-
+  //Edep
   G4String mEdepFilename;
+  GateImageWithStatistic mEdepImage;
+  //Dose
   G4String mDoseFilename;
+  GateImageWithStatistic mDoseImage;
+    //Efficiency option
+  G4String mDoseEfficiencyFile;
+  std::vector<double> mDoseEnergy;
+  std::vector<double> mDoseEfficiency;
+    //Efficiency option by Z (by ion atomic number)
+  std::vector<G4String> mDoseEfficiencyFileByZ;
+  std::vector<G4int> mDoseZByZ;
+  std::vector<std::vector<double>> mDoseEnergyByZ;
+  std::vector<std::vector<double>> mDoseEfficiencyByZ;
+  //DoseToWater
   G4String mDoseToWaterFilename;
+  GateImageWithStatistic mDoseToWaterImage;
+  //DoseToOtherMaterial
+  G4String mDoseToOtherMaterialFilename;
+  GateImageWithStatistic mDoseToOtherMaterialImage;
+  G4String mOtherMaterial;
+  //Hits
   G4String mNbOfHitsFilename;
-  G4String mRBE1AlphaFilename;
-  G4String mRBE1BetaFilename;
-  G4String mRBE1AlphaDataFilename;
-  G4String mRBE1BetaDataFilename;
-  G4String mRBE1FactorFilename;
-  G4String mRBE1BioDoseFilename;
+  GateImageInt mNumberOfHitsImage;
+  GateImageInt mLastHitEventImage;
+  //Others
+  GateImageDouble mMassImage;
+  //Regions
+  bool mDoseByRegionsFlag;
+  GateImageFloat mDoseByRegionsLabelImage;
+  GateRegionDoseStat::IdToSingleRegionMapType mMapIdToSingleRegion;
+  GateRegionDoseStat::LabelToSeveralRegionsMapType mMapLabelToSeveralRegions;
+  GateRegionDoseStat::IdToLabelsMapType mMapIdToLabels;
+  G4String mDoseByRegionsInputFilename;
+  G4String mDoseByRegionsOutputFilename;
 
-  std::vector<G4double> mAlphaLet;
-  std::vector<G4double> mAlphaValues;
-  std::vector<G4double> mBetaLet;
-  std::vector<G4double> mBetaValues;
+  G4String mDoseAlgorithmType;
+  G4String mImportMassImage;
+  G4String mExportMassImage;
+  G4String mVolumeFilter;
+  G4String mMaterialFilter;
 
-  G4EmCalculator * emcalc;
+  G4EmCalculator* emcalc;
+
 };
 
 MAKE_AUTO_CREATOR_ACTOR(DoseActor,GateDoseActor)

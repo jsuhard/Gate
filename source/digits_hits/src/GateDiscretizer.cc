@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -50,5 +50,5 @@ void GateDiscretizer::ProcessOnePulse(const GatePulse* inputPulse,GatePulseList&
 
 void GateDiscretizer::DescribeMyself(size_t indent)
 {
-  G4cout << GateTools::Indent(indent) << "Discretizer"  << G4endl;
+  G4cout << GateTools::Indent(indent) << "Discretizer"  << Gateendl;
 }

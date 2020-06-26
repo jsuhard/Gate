@@ -48,7 +48,7 @@ void GateMergeManager::StartMerging(string splitfileName){
   //string ready = "touch "+dir+"/ready_for_delete";
   //const int res=system(ready.c_str());
   //if(res) cout<<"Strange?? Can't mark "<<dir<<" as done!"<<endl;
-};
+}
 
 // to process the splitfile
 void GateMergeManager::ReadSplitFile(string splitfileName){
@@ -92,6 +92,7 @@ void GateMergeManager::ReadSplitFile(string splitfileName){
         m_RootTargetName+=".root";
         if(m_outDir!=""){// output directory option used
            //replace path with outDir
+           
            size_t pos=m_RootTargetName.rfind('/',m_RootTargetName.length());
            if(pos==string::npos) pos=-1;
            m_RootTargetName=m_outDir+m_RootTargetName.substr(pos+1);
@@ -210,8 +211,9 @@ void GateMergeManager::MergeRoot(){
       cout<<"No files to merge!"<<endl;
       exit(0);
    }
-
-   TFile* filearr[nfiles];
+   
+   filearr=new TFile*[nfiles];
+   //TFile* filearr[nfiles];
    for(int i=1;i<nfiles;i++) {
       filearr[i] = TFile::Open(m_vRootFileNames[i].c_str(),"OLD");
       if(filearr[i]==NULL){
@@ -299,7 +301,7 @@ void GateMergeManager::MergeRoot(){
      if(!MergeTree(treeNames[i])) if(m_verboseLevel>1) cout<<"Problem with merging "<<treeNames[i]<<endl; 
 
    // everything is done
-};
+}
 
 /*******************************************************************************************/
 // cleanup after merging
@@ -681,7 +683,7 @@ bool GateMergeManager::MergeSing(TChain* chainS){
     newSing->Write();
     delete newSing;
     return true;
-};
+}
 
 /*******************************************************************************************/
 // Coincidences tree merger

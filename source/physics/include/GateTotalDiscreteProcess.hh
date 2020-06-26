@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 /**
@@ -90,6 +90,8 @@ inline G4double 	GateTotalDiscreteProcess::PostStepGetPhysicalInteractionLength 
 	G4double b=m_oProcessVec[0]->PostStepGetPhysicalInteractionLength ( track, previousStepSize, condition );
 	m_nProcessWithSmallestPIL=0;
 	for (size_t i=1;i<m_oProcessVec.size();i++)
+	// shouldn't it be better ??
+	// for (std::vector<G4VDiscreteProcess*>::iterator itr=m_oProcessVec.begin(); itr!= m_oProcessVec.end(); ++itr)
 	{
 		
 		const G4double a=m_oProcessVec[i]->PostStepGetPhysicalInteractionLength (track, previousStepSize, condition);

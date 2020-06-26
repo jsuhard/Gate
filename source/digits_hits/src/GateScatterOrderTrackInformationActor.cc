@@ -3,12 +3,12 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #include "GateConfiguration.h"
 
-// Gate
+// Gate 
 #include "GateScatterOrderTrackInformationActor.hh"
 #include "GateMiscFunctions.hh"
 
@@ -27,8 +27,8 @@
     }                                                                   \
   catch( itk::ExceptionObject & err )                                   \
     {                                                                   \
-    std::cerr << "ExceptionObject caught with " #execFunc << std::endl; \
-    std::cerr << err << std::endl;                                      \
+    std::cerr << "ExceptionObject caught with " #execFunc << Gateendl; \
+    std::cerr << err << Gateendl;                                      \
     exit(EXIT_FAILURE);                                                 \
     }
 
@@ -38,15 +38,15 @@
 GateScatterOrderTrackInformationActor::GateScatterOrderTrackInformationActor(G4String name, G4int depth):
   GateVActor(name,depth)
 {
-  GateDebugMessageInc("Actor",4,"GateScatterOrderTrackInformationActor() -- begin"<<G4endl);
+  GateDebugMessageInc("Actor",4,"GateScatterOrderTrackInformationActor() -- begin\n");
   pActorMessenger = new GateScatterOrderTrackInformationActorMessenger(this);
-  GateDebugMessageDec("Actor",4,"GateScatterOrderTrackInformationActor() -- end"<<G4endl);
+  GateDebugMessageDec("Actor",4,"GateScatterOrderTrackInformationActor() -- end\n");
 }
 //-----------------------------------------------------------------------------
 
 
 //-----------------------------------------------------------------------------
-/// Destructor
+/// Destructor 
 GateScatterOrderTrackInformationActor::~GateScatterOrderTrackInformationActor()
 {
   delete pActorMessenger;
@@ -66,10 +66,9 @@ void GateScatterOrderTrackInformationActor::Construct()
 //-----------------------------------------------------------------------------
 // Callbacks
 void GateScatterOrderTrackInformationActor::UserSteppingAction(const GateVVolume * v,
-                                                        const G4Step * step)
+                                                               const G4Step * step)
 {
   GateVActor::UserSteppingAction(v, step);
-
   // Create a track information and attach it to the track
      if(step->GetTrack()->GetUserInformation()==0)
      {
@@ -83,33 +82,56 @@ void GateScatterOrderTrackInformationActor::UserSteppingAction(const GateVVolume
   const G4VEmProcess *process = dynamic_cast<const G4VEmProcess*>(pr);
   if(!process) return;
 
-  // unsigned int order = 0;
+  //unsigned int order = 0;
+  //G4String scatterProcess = "";
 
-  if(process->GetProcessName() == G4String("Compton")) {
-
-    GateScatterOrderTrackInformation * scatterTracking = dynamic_cast<GateScatterOrderTrackInformation*>(step->GetTrack()->GetUserInformation());
-    if(scatterTracking!=NULL)
-    {
-      scatterTracking->IncrementScatterOrder(step->GetTrack());
-      // order = scatterTracking->GetScatterOrder();
-    }
-
-    //G4cout << ", Order of Compton " << order << G4endl;
-
-  }
-  else if(process->GetProcessName() == G4String("RayleighScattering")) {
+  if(process->GetProcessName() == G4String("Compton") ||
+     process->GetProcessName() == G4String("compt")) {
 
     GateScatterOrderTrackInformation * scatterTracking = dynamic_cast<GateScatterOrderTrackInformation*>(step->GetTrack()->GetUserInformation());
     if(scatterTracking!=NULL)
     {
       scatterTracking->IncrementScatterOrder(step->GetTrack());
-      // order = scatterTracking->GetScatterOrder();
+      //order = scatterTracking->GetScatterOrder();
+      // Set process name
+      scatterTracking->SetScatterProcess(step->GetTrack());
     }
-
-    //G4cout << ", Order of Rayleigh  " << order << G4endl;
-
   }
-  else if(process->GetProcessName() == G4String("PhotoElectric")) {}
+  else if(process->GetProcessName() == G4String("RayleighScattering") ||
+          process->GetProcessName() == G4String("Rayl")) {
+
+    GateScatterOrderTrackInformation * scatterTracking = dynamic_cast<GateScatterOrderTrackInformation*>(step->GetTrack()->GetUserInformation());
+    if(scatterTracking!=NULL)
+    {
+      scatterTracking->IncrementScatterOrder(step->GetTrack());
+      //order = scatterTracking->GetScatterOrder();
+      // Set process name
+      scatterTracking->SetScatterProcess(step->GetTrack());
+    }
+  }
+  else if(process->GetProcessName() == G4String("PhotoElectric") ||
+          process->GetProcessName() == G4String("phot")) {
+    const G4TrackVector * list = step->GetSecondary();
+
+    for(unsigned short i=0; i<(*list).size(); i++)
+    {
+      if((*list)[i]->GetUserInformation()==0 && (*list)[i]->GetDefinition()->GetParticleName()=="gamma")
+      {
+        //GateScatterOrderTrackInformation * fluoTracking = (*list)[i]->GetUserInformation()
+        // Creation of gamma
+        GateScatterOrderTrackInformation* fluoInfo = new GateScatterOrderTrackInformation;
+        (*list)[i]->SetUserInformation(fluoInfo);
+      }
+      GateScatterOrderTrackInformation * fluoTracking = dynamic_cast<GateScatterOrderTrackInformation*>((*list)[i]->GetUserInformation());
+      if(fluoTracking!=NULL)
+      {
+        fluoTracking->IncrementScatterOrder((*list)[i]);
+        //order = fluoTracking->GetScatterOrder();
+        // Set process name
+        fluoTracking->SetScatterProcess(step->GetTrack());
+      }
+    }
+  }
 }
 
 //-----------------------------------------------------------------------------

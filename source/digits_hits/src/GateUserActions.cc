@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -20,17 +20,15 @@ See GATE/LICENSE.txt for further details
 
 #include "GateSteppingVerbose.hh"
 #include "G4SteppingManager.hh"
-
 #include "G4SliceTimer.hh"
 
 //class GateRecorderBase;
 GateUserActions* GateUserActions::pUserActions=0;
 
 //-----------------------------------------------------------------------------
-GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
-  : recorder(r)
+GateUserActions::GateUserActions(GateRunManager* m)
 {
-  GateMessage("Core", 4,"GateUserActions Constructor start."<<G4endl);
+  GateMessage("Core", 4,"GateUserActions Constructor start.\n");
 
   pUserActions = this;
 
@@ -52,10 +50,10 @@ GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
 
   // Set fGate' user action classes to the GateRunmanager :
   // Run/Event/Tracking/Stepping in order to get the callbacks
-  GateRunAction* RunAction = new GateRunAction(this, recorder);
-  GateEventAction* EventAction = new GateEventAction(this, recorder);
-  GateTrackingAction* TrackingAction = new GateTrackingAction(this, recorder);
-  GateSteppingAction* SteppingAction = new GateSteppingAction(this, recorder);
+  GateRunAction* RunAction = new GateRunAction(this);
+  GateEventAction* EventAction = new GateEventAction(this);
+  GateTrackingAction* TrackingAction = new GateTrackingAction(this);
+  GateSteppingAction* SteppingAction = new GateSteppingAction(this);
 
   pRunManager->SetUserAction(RunAction);
   pRunManager->SetUserAction(EventAction);
@@ -69,7 +67,7 @@ GateUserActions::GateUserActions(GateRunManager* m, GateRecorderBase* r)
 
   mTimer = new G4SliceTimer();
 
-  GateMessage("Core", 4,"GateUserActions Constructor end."<<G4endl);
+  GateMessage("Core", 4,"GateUserActions Constructor end.\n");
 }
 //-----------------------------------------------------------------------------
 
@@ -78,7 +76,7 @@ GateUserActions::~GateUserActions()
 {
 
   delete pUserActions;
-  GateDebugMessageInc("Core", 4, "GateUserActions Destructor."<<G4endl);
+  GateDebugMessageInc("Core", 4, "GateUserActions Destructor.\n");
 }
 //-----------------------------------------------------------------------------
 
@@ -117,7 +115,7 @@ void GateUserActions::EndOfRunAction(const G4Run* run)
     G4UImanager::GetUIpointer()->ApplyCommand("/vis/viewer/update");
   }
   mTimer->Stop();
-  GateMessage("Core",1,"Run "<<mRunNumber - 1<<"  ---  Elapsed time = "<<mTimer->GetUserElapsed()<<G4endl);
+  GateMessage("Core",1,"Run "<<mRunNumber - 1<<"  ---  Elapsed time = "<<mTimer->GetUserElapsed()<< Gateendl);
 }
 //-----------------------------------------------------------------------------
 
@@ -136,11 +134,11 @@ void GateUserActions::EndOfEventAction(const G4Event* evt)
 {
   GateActorManager::GetInstance()->EndOfEventAction(evt);
 //sizeof(v) + sizeof(T) * v.capacity();
-// G4cout<<G4endl;
+// G4cout<< Gateendl;
  // GateTrackIDInfo trInfo;
- //G4cout<<"Taille vecteur = "<<sizeof(theListOfTrackIDInfo)<<G4endl;
- //G4cout<<"Taille élément vecteur = "<<sizeof(trInfo)<<G4endl;
- //G4cout<<"Taille totale = "<<sizeof(theListOfTrackIDInfo)+sizeof(trInfo)*theListOfTrackIDInfo.size()<<G4endl;
+ //G4cout<<"Taille vecteur = "<<sizeof(theListOfTrackIDInfo)<< Gateendl;
+ //G4cout<<"Taille élément vecteur = "<<sizeof(trInfo)<< Gateendl;
+ //G4cout<<"Taille totale = "<<sizeof(theListOfTrackIDInfo)+sizeof(trInfo)*theListOfTrackIDInfo.size()<< Gateendl;
  for(std::map<G4int,GateTrackIDInfo>::iterator i = theListOfTrackIDInfo.begin(); i != theListOfTrackIDInfo.begin(); /*EMPTY*/)
  {
    theListOfTrackIDInfo.erase(i++);

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -22,7 +22,7 @@ GateImageRegionalizedVolumeMessenger::GateImageRegionalizedVolumeMessenger(GateI
   pVolume(volume)
 {
 
-  GateMessage("Volume",5,"GateImageRegionalizedVolumeMessenger()"<<G4endl);
+  GateMessage("Volume",5,"GateImageRegionalizedVolumeMessenger()\n");
 
   G4String n = GetDirectoryName() +"geometry/distanceMap";
   pDistanceMapNameCmd = new G4UIcmdWithAString(n,this);
@@ -34,7 +34,7 @@ GateImageRegionalizedVolumeMessenger::GateImageRegionalizedVolumeMessenger(GateI
 //====================================================================
 GateImageRegionalizedVolumeMessenger::~GateImageRegionalizedVolumeMessenger()
 {
-  GateMessage("Volume",5,"~GateImageRegionalizedVolumeMessenger()"<<G4endl);
+  GateMessage("Volume",5,"~GateImageRegionalizedVolumeMessenger()\n");
   delete  pDistanceMapNameCmd;
 }
 //====================================================================

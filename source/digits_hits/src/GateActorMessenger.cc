@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -96,17 +96,17 @@ void GateActorMessenger::BuildCommands(G4String base)
 //-----------------------------------------------------------------------------
 void GateActorMessenger::SetNewValue(G4UIcommand* command, G4String param)
 {
-  if(command == pSetVolumeNameCmd) {
+  if (command == pSetVolumeNameCmd) {
     pActor->SetVolumeName(param);
     pActor->AttachToVolume(param);
   }
 
-  if(command == pSetFileNameCmd) pActor->SetSaveFilename(param);
+  if (command == pSetFileNameCmd) pActor->SetSaveFilename(param);
 
-  if(command == pSaveEveryNEventsCmd)
+  if (command == pSaveEveryNEventsCmd)
     pActor->EnableSaveEveryNEvents(pSaveEveryNEventsCmd->GetNewIntValue(param));
 
-  if(command == pSaveEveryNSecondsCmd)
+  if (command == pSaveEveryNSecondsCmd)
     pActor->EnableSaveEveryNSeconds(pSaveEveryNSecondsCmd->GetNewIntValue(param));
 
   if (command == pSetOverWriteFilesFlagCmd)

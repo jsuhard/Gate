@@ -12,7 +12,6 @@ See GATE/LICENSE.txt for further details
 #ifndef GateSplitManager_h
 #define GateSplitManager_h 1
 #include "globals.hh"
-#include "vector"
 #include "GateToPlatform.hh"
 #include "GateMacfileParser.hh"
 
@@ -22,7 +21,7 @@ class GateSplitManager
 {
 public:
 
-  GateSplitManager(G4int nAliases,G4String* aliases,G4String platform,G4String pbsscript,G4String condorscript,G4String macfile,G4int nSplits,G4int time);
+  GateSplitManager(G4int nAliases,G4String* aliases,G4String platform,G4String pbsscript,G4String slurmscript,G4String condorscript,G4String macfile,G4int nSplits,G4int time);
   ~GateSplitManager();
   void SetVerboseLevel(G4int value) { m_verboseLevel = value; };
   void StartSplitting();

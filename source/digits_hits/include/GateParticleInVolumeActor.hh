@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -63,10 +63,11 @@ protected:
   bool mIsParticleInVolumeImageEnabled;
   bool outsideTrack;
 
-  GateImage mLastHitEventImage;
+  GateImageInt mLastHitEventImage;
   GateImage mParticleInVolumeImage;
 
   G4String mParticleInVolumeFilename;
+  G4int mCurrentEvent;
 };
 
 MAKE_AUTO_CREATOR_ACTOR(ParticleInVolumeActor,GateParticleInVolumeActor)

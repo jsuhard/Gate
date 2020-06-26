@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 /*----------------------
@@ -157,7 +157,7 @@ void GateToSinogramMessenger::SetNewValue(G4UIcommand* command,G4String newValue
  else if (command == SetVirtualRingCmd)
   {
     m_gateToSinogram->SetVirtualRingPerBlockNb(SetVirtualRingCmd->GetNewIntValue(newValue));
-   G4cout << G4endl<< G4endl<< " GateToSinogramMessenger: virtual rings = " << m_gateToSinogram->GetVirtualRingPerBlockNb() << G4endl<< G4endl<< G4endl;
+   G4cout << Gateendl<< Gateendl<< " GateToSinogramMessenger: virtual rings = " << m_gateToSinogram->GetVirtualRingPerBlockNb() << Gateendl<< Gateendl<< Gateendl;
 
   }
  // C. Comtat, February 2011: Required to simulate Biograph output sinograms with virtual crystals

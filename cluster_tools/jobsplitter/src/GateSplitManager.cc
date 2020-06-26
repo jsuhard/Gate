@@ -8,12 +8,18 @@ of the GNU Lesser General  Public Licence (LGPL)
 See GATE/LICENSE.txt for further details
 ----------------------*/
 
-
 #include "GateSplitManager.hh"
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
 GateSplitManager::GateSplitManager(G4int nAliases,G4String* aliases,G4String platform,G4String pbsscript,
-                                   G4String condorscript,G4String macfile,G4int nSplits,G4int time)
+                                   G4String slurmscript,G4String condorscript,G4String macfile,G4int nSplits,G4int time)
 {
- toPlatform = new GateToPlatform(nSplits,platform,pbsscript,condorscript,macfile,time);
+ toPlatform = new GateToPlatform(nSplits,platform,pbsscript,slurmscript,condorscript,macfile,time);
  macParser  = new GateMacfileParser(macfile,nSplits,nAliases,aliases);
  numberOfSplits=nSplits;
 }
@@ -54,7 +60,7 @@ void GateSplitManager::StartSplitting()
  G4String dir=getenv("GC_DOT_GATE_DIR");
  if (dir.substr(dir.length()-1,dir.length())=="/") dir=dir+".Gate/";
  else dir=dir+"/.Gate/";
- ifstream dirstream(dir.c_str()); 
+ std::ifstream dirstream(dir.c_str());
  if (!dirstream) { 
  const G4String mkdir("mkdir "+dir); 
  if(m_verboseLevel>1)cout<<"Information : Creating a .Gate directory... "; 
@@ -79,7 +85,7 @@ void GateSplitManager::StartSplitting()
 
 void GateSplitManager::CleanAbort()
 {
- ofstream tmp1, tmp2;
+ std::ofstream tmp1, tmp2;
  if (macParser) macParser->CleanAbort(tmp1,tmp2);
  cout<<"Made clean exit !"<<endl;  
  exit(1);

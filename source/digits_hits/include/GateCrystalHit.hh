@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -55,11 +55,14 @@ class GateCrystalHit : public G4VHit
 private:
   G4double m_edep;            // energy deposit for the current hit
   G4double m_stepLength;      // length of the step for the current hit
+  G4double m_trackLength;      // length of the track 
   G4double m_time;            // time of the current hit
+  G4double m_trackLocalTime;  // time of the current track
   G4ThreeVector m_pos;        // position of the current hit
   G4double m_posx;
   G4double m_posy;
   G4double m_posz;
+  G4ThreeVector m_momDir;        // momentum Direction of the current hit
   G4ThreeVector m_localPos;   // position of the current hit
   G4String m_process;         // process on the current hit
   G4int m_PDGEncoding;        // G4 PDGEncoding
@@ -89,6 +92,15 @@ private:
   // HDS : Added in order to record septal penetration
   G4int m_nSeptal;
 
+
+// AE : Added for IdealComptonPhot adder which take into account several Comptons in the same volume
+   G4String m_Postprocess;         // PostStep process 
+   G4double m_energyIniTrack;         // Initial energy of the track
+   G4double m_energyFin;         // final energy of the particle
+   G4double m_sourceEnergy;//AE
+   G4int m_sourcePDG;//AE
+   G4int m_nCrystalConv;    // # of pair creation process in the crystal occurred to the photon
+
   public:
       inline void SetEdep(G4double de)          { m_edep = de; }
       inline void AddEdep(G4double de)          { m_edep += de; }
@@ -97,6 +109,12 @@ private:
       inline void SetStepLength(G4double value) { m_stepLength = value; }
       inline G4double GetStepLength() const          { return m_stepLength; }
 
+      inline void SetTrackLength(G4double value) { m_trackLength = value; }
+      inline G4double GetTrackLength() const          { return m_trackLength; }
+      
+      inline void     SetTrackLocalTime(G4double aTime)    { m_trackLocalTime = aTime; }
+      inline G4double GetTrackLocalTime() const                { return m_trackLocalTime; }
+
       inline void     SetTime(G4double aTime)    { m_time = aTime; }
       inline G4double GetTime() const                { return m_time; }
 
@@ -104,8 +122,12 @@ private:
       inline const G4ThreeVector& GetGlobalPos() const            { return m_pos; }
 
 
+      inline void  SetMomentumDir(const G4ThreeVector& xyz)     { m_momDir = xyz; }
+      inline const G4ThreeVector& GetMomentumDir() const             { return m_momDir; }
+
       inline void  SetLocalPos(const G4ThreeVector& xyz)     { m_localPos = xyz; }
       inline const G4ThreeVector& GetLocalPos() const             { return m_localPos; }
+
 
       inline void     SetProcess(G4String proc) { m_process = proc; }
       inline G4String GetProcess() const             { return m_process; }
@@ -177,6 +199,34 @@ private:
       // HDS : Added in order to record septal penetration
       inline void  SetNSeptal(G4int j)  { m_nSeptal = j; }
       inline G4int GetNSeptal() const        { return m_nSeptal; }
+
+
+
+
+      // AE : Added for IdealComptonPhot adder which take into account several Comptons in the same volume 
+      inline void     SetPostStepProcess(G4String proc) { m_Postprocess = proc; }
+      inline G4String GetPostStepProcess() const             { return m_Postprocess; }
+     
+      inline void SetEnergyIniTrack(G4double eIni)          { m_energyIniTrack = eIni; }
+      inline G4double GetEnergyIniTrack() const                { return m_energyIniTrack; }
+
+      inline void SetEnergyFin(G4double eFin)          { m_energyFin = eFin; }
+      inline G4double GetEnergyFin() const                { return m_energyFin; }
+
+      /////--------------------------------------------------------------
+
+
+      //------AE-------------------------------------------------------------------------
+      inline void  SetSourceEnergy(G4double value)     { m_sourceEnergy = value; }
+      inline  G4double GetSourceEnergy() const        { return m_sourceEnergy; }
+
+      inline void  SetSourcePDG(G4int value)     { m_sourcePDG = value; }
+      inline  G4int GetSourcePDG() const        { return m_sourcePDG; }
+
+
+      inline void  SetNCrystalConv(G4int value)     { m_nCrystalConv = value; }
+      inline  G4int GetNCrystalConv() const        { return m_nCrystalConv; }
+      //----------------------------------------------------------------
 
 
       // To test move part of the code ---------------------------------------------------------

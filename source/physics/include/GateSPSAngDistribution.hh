@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -29,6 +29,15 @@ class GateSPSAngDistribution : public G4SPSAngDistribution
   GateSPSAngDistribution () ;
   ~GateSPSAngDistribution () ; 
 
+  // FocusPointCopy is a copy of the private member FocusPoint in G4SPSAngDistribution
+  // that cannot be accessed from get because there is no GetFocusPoint and the member
+  // is private. Every call to GateSPSAngDistribution::SetFocusPoint is doubled with a
+  // call to GateSPSAngDistribution::SetFocusPointCopy to be able to access its value.
+  G4ThreeVector GetFocusPointCopy();  
+  void 	SetFocusPointCopy (G4ThreeVector);
+
+ private :
+  G4ThreeVector FocusPointCopy;
 } ;
 
 #endif

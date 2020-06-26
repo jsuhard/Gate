@@ -1,18 +1,18 @@
 /*----------------------
-   Copyright (C): OpenGATE Collaboration
+  Copyright (C): OpenGATE Collaboration
 
-This software is distributed under the terms
-of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
-----------------------*/
+  This software is distributed under the terms
+  of the GNU Lesser General  Public Licence (LGPL)
+  See LICENSE.md for further details
+  ----------------------*/
 
 
 /*! \file
   \class GateVImageVolume :
   \brief Base (abstract) class for volumes which represent the data provided by a 3D image of labels and a label to material correspondence table
   \author thibault.frisson@creatis.insa-lyon.fr
-          laurent.guigues@creatis.insa-lyon.fr
-	  david.sarrut@creatis.insa-lyon.fr
+  laurent.guigues@creatis.insa-lyon.fr
+  david.sarrut@creatis.insa-lyon.fr
 */
 
 #ifndef __GateVImageVolume__hh__
@@ -94,6 +94,7 @@ public:
   //-----------------------------------------------------------------------------
   void SetIsoCenter(const G4ThreeVector & i);
   G4ThreeVector GetIsoCenter() const { return mIsoCenter; }
+  void SetIsoCenterRotationFlag(G4bool b) { mIsoCenterRotationFlag = b; }
   //-----------------------------------------------------------------------------
 
   //-----------------------------------------------------------------------------
@@ -119,7 +120,7 @@ public:
   G4String GetMaterialNameFromLabel(LabelType l) {
     LabelToMaterialNameType::iterator mi = mLabelToMaterialName.find(l);
     if (mi == mLabelToMaterialName.end()) {
-      G4cerr << "GateVImageVolume<"<<GetObjectName()<<">::GetMaterialNameFromLabel : Could not find material of label "<<l<<" in correspondence table" << G4endl;
+      G4cerr << "GateVImageVolume<"<<GetObjectName()<<">::GetMaterialNameFromLabel : Could not find material of label "<<l<<" in correspondence table\n";
       exit(0);
     }
     return (*mi).second ;
@@ -135,7 +136,7 @@ public:
 
   typedef std::map<G4Material*, G4VisAttributes*>          GateVoxelAttributesTranslationMap;
   GateVoxelAttributesTranslationMap                        m_voxelAttributesTranslation;
-  
+
   //-----------------------------------------------------------------------------
   /// Builds a label to material map
   void BuildLabelToG4MaterialVector( std::vector<G4Material*>& );
@@ -152,7 +153,7 @@ public:
   //-----------------------------------------------------------------------------
   // Used by the navigator
   int GetNextVoxel(const G4ThreeVector& position,
-				   const G4ThreeVector& direction);
+                   const G4ThreeVector& direction);
 
   virtual void GetPhysVolForAVoxel(const G4int, const G4VTouchable &, G4VPhysicalVolume **, G4NavigationHistory &) const {}
   //-----------------------------------------------------------------------------
@@ -161,7 +162,10 @@ public:
 
   void SetBuildDistanceTransfoFilename(G4String filename);
   void SetLabeledImageFilename(G4String filename);
+  void SetDensityImageFilename(G4String filename);
+  void SetMassImageFilename   (G4String filename) {mMassImageFilename = filename;}
   void EnableBoundingBoxOnly(bool b);
+  void SetMaxOutOfRangeFraction(double f);
 
 protected:
 
@@ -180,8 +184,8 @@ protected:
   G4String mRangeToImageMaterialTableFilename;
   bool mLoadImageMaterialsFromHounsfieldTable;
   bool mLoadImageMaterialsFromLabelTable;
-  GateHounsfieldMaterialTable mHounsfieldMaterialTable; 
-  GateRangeMaterialTable mRangeMaterialTable; 
+  GateHounsfieldMaterialTable mHounsfieldMaterialTable;
+  GateRangeMaterialTable mRangeMaterialTable;
   //-----------------------------------------------------------------------------
 
   //-----------------------------------------------------------------------------
@@ -202,7 +206,14 @@ protected:
   bool mWriteHLabelImage;
   G4String mHLabelImageFilename;
   void DumpHLabelImage();
+  //-----------------------------------------------------------------------------
+  bool mWriteDensityImage;
+  G4String mDensityImageFilename;
+  void DumpDensityImage();
+  G4String mMassImageFilename;
+  void DumpMassImage();
   bool mImageMaterialsFromHounsfieldTableDone;
+  bool mImageMaterialsFromRangeTableDone;
 
   //-----------------------------------------------------------------------------
   /// The name of the Image file
@@ -226,9 +237,10 @@ protected:
 
   //-----------------------------------------------------------------------------
   /// IsoCenter
-  G4ThreeVector mIsoCenter;
-  G4bool        mIsoCenterIsSetByUser;
-  G4ThreeVector mInitialTranslation;
+  G4ThreeVector    mIsoCenter;
+  G4bool           mIsoCenterIsSetByUser;
+  G4bool           mIsoCenterRotationFlag;
+  G4ThreeVector    mInitialTranslation;
   G4RotationMatrix mTransformMatrix;
   //-----------------------------------------------------------------------------
 
@@ -239,6 +251,9 @@ protected:
 
   //-----------------------------------------------------------------------------
   bool mIsBoundingBoxOnlyModeEnabled;
+  unsigned int mUnderflow;
+  unsigned int mOverflow;
+  double mMaxOutOfRangeFraction;
 };
 // EO class GateVImageVolume
 //-----------------------------------------------------------------------------

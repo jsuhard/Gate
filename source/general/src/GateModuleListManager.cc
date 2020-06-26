@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -36,6 +36,6 @@ GateModuleListManager::~GateModuleListManager()
 void GateModuleListManager::Describe(size_t indent)
 {
   GateListManager::Describe(indent);
-  G4cout << GateTools::Indent(indent) << "Attached to:        '" << pMotherObject->GetObjectName() << "'" << G4endl;
+  G4cout << GateTools::Indent(indent) << "Attached to:        '" << pMotherObject->GetObjectName() << "'\n";
 }
 //--------------------------------------------------------------------------------------------

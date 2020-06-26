@@ -3,25 +3,28 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
 #ifndef GateSimplifiedDecay_H
 #define GateSimplifiedDecay_H 1
 
+// for_each
+#include <algorithm>
+// mem_fun
+#include <functional>
 #include <vector>
 #include "GateSimplifiedDecayTransition.hh"
-#include "Randomize.hh"
 
 class GateSimplifiedDecay{
 
 public:
 
-  GateSimplifiedDecay():transitionVector(new vector<GateSimplifiedDecayTransition*>){;}
+  GateSimplifiedDecay():transitionVector(new std::vector<GateSimplifiedDecayTransition*>){;}
 
   ~GateSimplifiedDecay(){
-    vector<GateSimplifiedDecayTransition*>::iterator i = this->transitionVector->begin();
+    std::vector<GateSimplifiedDecayTransition*>::iterator i = this->transitionVector->begin();
     for( ; i != this->transitionVector->end(); ++i ) {
       delete *i;
     }
@@ -30,7 +33,7 @@ public:
   }
 
   void print(){
-    for_each(  transitionVector->begin(),  transitionVector->end(), mem_fun( &GateSimplifiedDecayTransition::print)  );
+    std::for_each(  transitionVector->begin(),  transitionVector->end(), std::mem_fn( &GateSimplifiedDecayTransition::print)  );
   }
 
   void sample(int n, int k){
@@ -41,10 +44,10 @@ public:
     transitionVector->push_back(t );
   }
 
-  vector<psd>* doDecay( vector<psd>* );
+  std::vector<psd>* doDecay( std::vector<psd>* );
 
 private:
-  vector<GateSimplifiedDecayTransition*>* transitionVector;
+  std::vector<GateSimplifiedDecayTransition*>* transitionVector;
 
 };
 

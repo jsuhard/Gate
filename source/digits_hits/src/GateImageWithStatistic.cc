@@ -1,10 +1,10 @@
 /*----------------------
-   Copyright (C): OpenGATE Collaboration
+  Copyright (C): OpenGATE Collaboration
 
-This software is distributed under the terms
-of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
-----------------------*/
+  This software is distributed under the terms
+  of the GNU Lesser General  Public Licence (LGPL)
+  See LICENSE.md for further details
+  ----------------------*/
 
 
 
@@ -26,6 +26,7 @@ GateImageWithStatistic::GateImageWithStatistic()  {
   mNormalizedToIntegral = false;
 }
 //-----------------------------------------------------------------------------
+
 
 //-----------------------------------------------------------------------------
 /// Destructor
@@ -60,18 +61,16 @@ void GateImageWithStatistic::SetTransformMatrix(const G4RotationMatrix & m) {
 
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::SetScaleFactor(double s) {
-  // if (s==1.0) mIsValuesMustBeScaled = false;
-//   else {
-    mScaleFactor = s;
-    mIsValuesMustBeScaled = true;
- //  }
+  mScaleFactor = s;
+  mIsValuesMustBeScaled = true;
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::SetResolutionAndHalfSize(const G4ThreeVector & resolution,
-						      const G4ThreeVector & halfSize,
-						      const G4ThreeVector & position)  {
+                                                      const G4ThreeVector & halfSize,
+                                                      const G4ThreeVector & position)  {
 
   mValueImage.SetResolutionAndHalfSize(resolution, halfSize, position);
   if (mIsUncertaintyImageEnabled) {
@@ -92,13 +91,39 @@ void GateImageWithStatistic::SetResolutionAndHalfSize(const G4ThreeVector & reso
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::SetResolutionAndHalfSize(const G4ThreeVector & resolution,
-						      const G4ThreeVector & halfSize)  {
+                                                      const G4ThreeVector & halfSize)  {
   G4ThreeVector mPosition = G4ThreeVector(0.0, 0.0, 0.0);
   SetResolutionAndHalfSize(resolution, halfSize, mPosition);
 }
 //-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+void GateImageWithStatistic::SetResolutionAndHalfSizeCylinder(const G4ThreeVector & resolution,
+						      const G4ThreeVector & halfSize, const G4ThreeVector & position)  {
+  
+  mValueImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+  if (mIsUncertaintyImageEnabled) {
+    mUncertaintyImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+    if (!mIsSquaredImageEnabled) {
+      mSquaredImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+      mTempImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+      mScaledSquaredImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+    }
+  }
+  if (mIsSquaredImageEnabled) {
+    mSquaredImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+    mTempImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+    mScaledSquaredImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+  }
+
+  mScaledValueImage.SetResolutionAndHalfSizeCylinder(resolution, halfSize, position);
+}
+//-----------------------------------------------------------------------------
+
 
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::Allocate() {
@@ -120,6 +145,7 @@ void GateImageWithStatistic::Allocate() {
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::Reset(double val) {
   mValueImage.Fill(val);
@@ -140,11 +166,13 @@ void GateImageWithStatistic::Reset(double val) {
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::Fill(double value) {
   mValueImage.Fill(value);
 }
 //-----------------------------------------------------------------------------
+
 
 //-----------------------------------------------------------------------------
 double GateImageWithStatistic::GetValue(const int index) {
@@ -152,37 +180,42 @@ double GateImageWithStatistic::GetValue(const int index) {
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::SetValue(const int index, double value) {
   mValueImage.SetValue(index, value);
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::AddValue(const int index, double value) {
-  GateDebugMessage("Actor", 2, "AddValue index=" << index << " value=" << value << G4endl);
+  GateDebugMessage("Actor", 2, "AddValue index=" << index << " value=" << value << Gateendl);
   mValueImage.AddValue(index, value);
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::AddTempValue(const int index, double value) {
-  GateDebugMessage("Actor", 2, "AddTempValue index=" << index << " value=" << value << G4endl);
+  GateDebugMessage("Actor", 2, "AddTempValue index=" << index << " value=" << value << Gateendl);
   mTempImage.AddValue(index, value);
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::AddValueAndUpdate(const int index, double value) {
 
-  GateDebugMessageInc("Actor", 2, "AddValue and update -- start: "<<mTempImage.GetSize() << G4endl);
+  GateDebugMessageInc("Actor", 2, "AddValue and update -- start: "<<mTempImage.GetSize() << Gateendl);
   double tmp = mTempImage.GetValue(index);
   mValueImage.AddValue(index, tmp);
   if (mIsSquaredImageEnabled || mIsUncertaintyImageEnabled) mSquaredImage.AddValue(index, tmp*tmp);
   mTempImage.SetValue(index, value);
-  GateDebugMessageDec("Actor", 2, "AddValue and update -- end"<< G4endl);
+  GateDebugMessageDec("Actor", 2, "AddValue and update -- end"<< Gateendl);
 }
 //-----------------------------------------------------------------------------
+
 
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::SetFilename(G4String f) {
@@ -196,6 +229,7 @@ void GateImageWithStatistic::SetFilename(G4String f) {
 }
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::SaveData(int numberOfEvents, bool normalise) {
 
@@ -206,20 +240,25 @@ void GateImageWithStatistic::SaveData(int numberOfEvents, bool normalise) {
     mUncertaintyFilename = GetSaveCurrentFilename(mUncertaintyInitialFilename);
   }
 
-  static double factor=1.0;
-  if (mIsSquaredImageEnabled || mIsUncertaintyImageEnabled) {UpdateImage();}
+  double factor=1.0;
+  if (mIsSquaredImageEnabled || mIsUncertaintyImageEnabled) { UpdateImage(); }
+  if (mIsSquaredImageEnabled) { UpdateSquaredImage(); }
+  if (mIsUncertaintyImageEnabled) {
+    if (!mIsSquaredImageEnabled) UpdateSquaredImage();
+    UpdateUncertaintyImage(numberOfEvents);
+  }
 
   if (mIsValuesMustBeScaled == true) {
-    //DD(mScaleFactor);
     factor = mScaleFactor;
   }
 
+  // If normalize, change the scale factor according to max or sum
   if (normalise) {
     mIsValuesMustBeScaled = true;
     double sum = 0.0;
     double max = 0.0;
-    GateImage::const_iterator pi = mValueImage.begin();
-    GateImage::const_iterator pe = mValueImage.end();
+    GateImageDouble::const_iterator pi = mValueImage.begin();
+    GateImageDouble::const_iterator pe = mValueImage.end();
     while (pi != pe) {
       if (*pi > max) max = *pi;
       sum += *pi*factor;
@@ -229,43 +268,51 @@ void GateImageWithStatistic::SaveData(int numberOfEvents, bool normalise) {
     if (mNormalizedToIntegral) SetScaleFactor(factor*1.0/sum);
   }
 
-  GateMessage("Actor", 2, "Save " << mFilename << " with scaling = "
-	      << mScaleFactor << "(" << mIsValuesMustBeScaled << ")" << G4endl);
+  GateMessage("Actor", 1, "Save " << mFilename << " with scaling = "
+              << mScaleFactor << "(" << mIsValuesMustBeScaled << ")\n");
 
-  if (!mIsValuesMustBeScaled) mValueImage.Write(mFilename);
+  if (!mIsValuesMustBeScaled) {
+    mValueImage.Write(mFilename);
+    if (mIsSquaredImageEnabled) mSquaredImage.Write(mSquaredFilename);
+  }
   else {
-    GateImage::iterator po = mScaledValueImage.begin();
-    GateImage::iterator pi = mValueImage.begin();
-    GateImage::const_iterator pe = mValueImage.end();
-    while (pi != pe) {
-      *po = (*pi)*mScaleFactor;
-      ++pi;
-      ++po;
+    GateImageDouble::iterator po = mScaledValueImage.begin();
+    GateImageDouble::iterator pi = mValueImage.begin();
+    GateImageDouble::const_iterator pe = mValueImage.end();
+    if (mIsSquaredImageEnabled){
+      GateImageDouble::iterator pii = mSquaredImage.begin();
+      GateImageDouble::iterator poo = mScaledSquaredImage.begin();
+      while (pi != pe) {
+	*po = (*pi)*mScaleFactor;
+	*poo = (*pii)*mScaleFactor*mScaleFactor;
+	++pi;
+	++po;
+	++pii;
+	++poo;
+      }
+      mScaledSquaredImage.Write(mSquaredFilename);
+    }
+    else {
+      while (pi != pe) {
+	*po = (*pi)*mScaleFactor;
+	++pi;
+	++po;
+      }
     }
     mScaledValueImage.Write(mFilename);
-    SetScaleFactor(factor);
+    SetScaleFactor(factor); // set back previous scaling factor
   }
 
-  if (mIsSquaredImageEnabled) {
-    UpdateSquaredImage();
-    if(!mIsValuesMustBeScaled)  mSquaredImage.Write(mSquaredFilename);
-    else mScaledSquaredImage.Write(mSquaredFilename);
-  }
-  if (mIsUncertaintyImageEnabled) {
-    if (!mIsSquaredImageEnabled) UpdateSquaredImage();
-    UpdateUncertaintyImage(numberOfEvents);
-    mUncertaintyImage.Write(mUncertaintyFilename);
-    mSquaredImage.Write(mSquaredFilename); // force output of squared dose for grid
-  }
-
+  if (mIsUncertaintyImageEnabled) mUncertaintyImage.Write(mUncertaintyFilename);
 }
 //-----------------------------------------------------------------------------
+
 
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::UpdateImage() {
-  GateImage::iterator pi = mValueImage.begin();
-  GateImage::iterator pt = mTempImage.begin();
-  GateImage::const_iterator pe = mValueImage.end();
+  GateImageDouble::iterator pi = mValueImage.begin();
+  GateImageDouble::iterator pt = mTempImage.begin();
+  GateImageDouble::const_iterator pe = mValueImage.end();
   while (pi != pe) {
     *pi += (*pt);
     ++pt;
@@ -273,57 +320,34 @@ void GateImageWithStatistic::UpdateImage() {
   }
 }
 //-----------------------------------------------------------------------------
+
 
 //-----------------------------------------------------------------------------
 void GateImageWithStatistic::UpdateSquaredImage() {
-  GateImage::iterator pi = mSquaredImage.begin();
-  GateImage::iterator pt = mTempImage.begin();
-  GateImage::const_iterator pe = mSquaredImage.end();
-  GateImage::iterator po;
-
-  if(mIsValuesMustBeScaled) po = mScaledSquaredImage.begin();
-
-  double fact = mScaleFactor*mScaleFactor;
+  GateImageDouble::iterator pi = mSquaredImage.begin();
+  GateImageDouble::iterator pt = mTempImage.begin();
+  GateImageDouble::const_iterator pe = mSquaredImage.end();
   while (pi != pe) {
     *pi += (*pt)*(*pt);
-      if(mIsValuesMustBeScaled)  {  *po = (*pi)*fact;++po;}
     *pt = 0;
     ++pt;
     ++pi;
   }
 }
-/*void GateImageWithStatistic::UpdateSquaredImage() {
-  GateImage::iterator pi = mValueImage.begin();
-  GateImage::iterator pt = mTempImage.begin();
-  GateImage::iterator pii = mSquaredImage.begin();
-  GateImage::const_iterator pe = mValueImage.end();
-  while (pi != pe) {
-    *pi += (*pt);
-    *pii += (*pt)*(*pt);
-    *pt = 0;
-    ++pii;
-    ++pt;
-    ++pi;
-  }
-}*/
 //-----------------------------------------------------------------------------
 
+
 //-----------------------------------------------------------------------------
-void GateImageWithStatistic::UpdateUncertaintyImage(int numberOfEvents) {
+void GateImageWithStatistic::UpdateUncertaintyImage(int numberOfEvents)
+{
+  GateImageDouble::iterator po = mUncertaintyImage.begin();
+  GateImageDouble::iterator pi;
+  GateImageDouble::iterator pii;
+  GateImageDouble::const_iterator pe;
 
-  GateImage::iterator po = mUncertaintyImage.begin();
-  GateImage::iterator pi;
-  GateImage::iterator pii;
-  GateImage::const_iterator pe;
-
-  if(mIsValuesMustBeScaled)  pi = mScaledValueImage.begin();
-  else pi = mValueImage.begin();
-
-  if(mIsValuesMustBeScaled) pii = mScaledSquaredImage.begin();
-  else pii = mSquaredImage.begin();
-
-  if(mIsValuesMustBeScaled)  pe = mScaledValueImage.end();
-  else pe = mValueImage.end();
+  pi = mValueImage.begin();
+  pii = mSquaredImage.begin();
+  pe = mValueImage.end();
 
   int N = numberOfEvents;
 
@@ -331,12 +355,10 @@ void GateImageWithStatistic::UpdateUncertaintyImage(int numberOfEvents) {
     double squared = (*pii);
     double mean = (*pi);
 
-
     // Ma2002 p1679 : relative statistical uncertainty
     /*	if (mean != 0.0)
      *po = sqrt( (N*squared - mean*mean) / ((N-1)*(mean*mean)) );
      else *po = 1;*/
-
 
     // Chetty2006 p1250 : relative statistical uncertainty
     // exactly same than Ma2002

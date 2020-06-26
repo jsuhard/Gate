@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 /*
@@ -27,32 +27,24 @@ See GATE/LICENSE.txt for further details
 #include <iomanip>
 #include <vector>
 
-//#include "G4RunManager.hh"
 #include "GateRunManager.hh"
 
 #include "GateMessageManager.hh"
 #include "GateActorManager.hh"
 #include "GateMessageManager.hh"
-//#include "GateActions.hh"
-
 #include "GateTrajectory.hh"
-#include "GateRecorderBase.hh"
-
 #include "GateSteppingVerbose.hh"
 #include "G4VSteppingVerbose.hh"
 
-//class GateRecorderBase;
+
 class GateRunAction;
 class GateEventAction;
-
 class G4SliceTimer;
-
-
 
 class GateUserActions
 {
 public:
-  GateUserActions(GateRunManager* m, GateRecorderBase* r);
+  GateUserActions(GateRunManager* m);
   ~GateUserActions();
 
   //-----------------------------------------------------------------------------
@@ -129,7 +121,7 @@ protected:
 
   static GateUserActions* pUserActions;
 
-  GateRecorderBase* recorder;
+
   GateRunAction* runAction;
   GateEventAction* eventAction;
 

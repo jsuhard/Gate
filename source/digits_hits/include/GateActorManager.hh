@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -49,10 +49,10 @@ public:
   {
     if (singleton_ActorManager == 0)
     {
-      //std::cout << "creating GateActorManager..." << std::endl;
+      //std::cout << "creating GateActorManager...\n";
       singleton_ActorManager = new GateActorManager;
     }
-    //else std::cout << "GateActorManager already created!" << std::endl;
+    //else std::cout << "GateActorManager already created!\n";
     return singleton_ActorManager;
   };
 

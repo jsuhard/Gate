@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 #include "GateConfiguration.h"
@@ -24,7 +24,7 @@ public:
   virtual ~GateScatterOrderTrackInformationActorMessenger();
 
   //NOTE: we keep the messenger member functions just in case we want to add new options to the actor
-  void BuildCommands(G4String base);
+  void BuildCommands(G4String);
   void SetNewValue(G4UIcommand*, G4String);
 
 protected:

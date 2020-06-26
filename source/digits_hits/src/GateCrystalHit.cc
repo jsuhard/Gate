@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -27,7 +27,10 @@ GateCrystalHit::GateCrystalHit()
   m_PDGEncoding(0),
   m_trackID(0),
   m_parentID(0),
-  m_systemID(-1)
+  m_systemID(-1),
+  m_sourceEnergy(-1),
+  m_sourcePDG(0),
+  m_nCrystalConv(0)
 {;}
 //---------------------------------------------------------------------
 
@@ -60,7 +63,7 @@ void GateCrystalHit::Draw()
 void GateCrystalHit::Print()
 {
   G4cout << this;
-  G4cout << G4endl;
+  G4cout << Gateendl;
 }
 //---------------------------------------------------------------------
 
@@ -110,7 +113,7 @@ std::ofstream& operator<<(std::ofstream& flux, GateCrystalHit* hit)
 	 << " " << hit->m_process
 	 << " " << hit->m_comptonVolumeName
 	 << " " << hit->m_RayleighVolumeName
-	 << G4endl;
+	 << Gateendl;
 
   return flux;
 }

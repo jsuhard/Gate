@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -77,5 +77,5 @@ GateCoincidencePulse* GateCoincidenceBuffer::ProcessPulse(GateCoincidencePulse* 
 void GateCoincidenceBuffer::DescribeMyself(size_t indent)
 {
   G4cout << GateTools::Indent(indent) << "Buffer: " << G4BestUnit(m_bufferSize,"Memory size")
-         << "Read @ "<< G4BestUnit(m_readFrequency,"Frequency")<<G4endl;
+         << "Read @ "<< G4BestUnit(m_readFrequency,"Frequency")<< Gateendl;
 }

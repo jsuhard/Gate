@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -73,7 +73,7 @@ public:
   /// Creates the messenger associated to the volume
   GateImageRegionalizedVolume(const G4String& name,G4bool acceptsChildren,G4int depth);
   /// Destructor
-  ~GateImageRegionalizedVolume();
+  virtual ~GateImageRegionalizedVolume();
   //====================================================================
   FCT_FOR_AUTO_CREATOR_VOLUME(GateImageRegionalizedVolume)
 

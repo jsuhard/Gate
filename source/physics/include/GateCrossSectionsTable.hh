@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 #ifndef GateCrossSectionsTable_hh
@@ -119,7 +119,7 @@ inline G4double GateCrossSectionsTable::GetCrossSection ( size_t materialIndex, 
 	assert ( size() >materialIndex );
 	assert ( energy>=m_nMinEnergy );
 	assert ( energy<m_nMaxEnergy );
-	//G4cout << "material no " << materialIndex << " energy "<< energy << G4endl;
+	//G4cout << "material no " << materialIndex << " energy "<< energy << Gateendl;
 	return operator() ( materialIndex )->GetValue ( energy,NotUsedAnyMoreIsOutOfRange );
 }
 

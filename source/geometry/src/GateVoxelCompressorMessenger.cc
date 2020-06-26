@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -19,7 +19,7 @@ GateVoxelCompressorMessenger::GateVoxelCompressorMessenger(GateVoxelCompressor *
    m_inserter(itsInserter)
 { 
  
-  // G4cout << "GateVoxelCompressorMessenger::GateVoxelCompressorMessenger - Entered " << GetDirectoryName() << G4endl; 
+  // G4cout << "GateVoxelCompressorMessenger::GateVoxelCompressorMessenger - Entered " << GetDirectoryName() << Gateendl; 
 
   GetDirectory()->SetGuidance("Controls phantom compression.");
 

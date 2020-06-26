@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -74,8 +74,8 @@ void GateObjectStore::UnregisterCreator(GateVVolume* creator)
 // List the object creators stored in the creator list
 void GateObjectStore::ListCreators()
 {
-  G4cout << "Nb of volumes:       " << size() << G4endl;
-  G4cout << DumpMap(true,"","\n","\t\t") << G4endl;
+  G4cout << "Nb of volumes:       " << size() << Gateendl;
+  G4cout << DumpMap(true,"","\n","\t\t") << Gateendl;
 }
 //----------------------------------------------------------------------------
 
@@ -106,8 +106,8 @@ GateVVolume* GateObjectStore::FindVolumeCreator(const G4String& volumeName)
   }
 
   GateError("The volume '" << volumeName << "' cannot be found in the list of volumes. Abort. "
-            << G4endl << "Here is the list of available volumes : " 
-            << G4endl << list << G4endl);
+            << Gateendl << "Here is the list of available volumes : " 
+            << Gateendl << list << Gateendl);
   return 0;
 }
 //---------------------------------------------------------------------------

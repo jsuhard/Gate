@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -19,7 +19,7 @@
 //-----------------------------------------------------------------------------
 GateMultiSensitiveDetector::GateMultiSensitiveDetector(G4String name)
   :G4VSensitiveDetector(name),GateNamedObject(name)
-{  
+{
   pSensitiveDetector = 0;
   pMultiFunctionalDetector = 0;
 }
@@ -29,19 +29,18 @@ GateMultiSensitiveDetector::GateMultiSensitiveDetector(G4String name)
 GateMultiSensitiveDetector::~GateMultiSensitiveDetector()
 {
 
-  //if (pSensitiveDetector != 0) delete pSensitiveDetector; //already delete by G4 
-  if (pMultiFunctionalDetector != 0) delete pMultiFunctionalDetector;
-  // pMultiFunctionalDetector = 0;
+  // if (pSensitiveDetector != 0) delete pSensitiveDetector; //already delete by G4
+  // if (pMultiFunctionalDetector != 0) delete pMultiFunctionalDetector;
 }
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 void GateMultiSensitiveDetector::Initialize(G4HCofThisEvent* hcte)
 {
-  GateDebugMessageInc("SD",4,"GateMultiSenstiveDetector -- Initialize() -- begin"<<G4endl);
+  GateDebugMessageInc("SD",4,"GateMultiSenstiveDetector -- Initialize() -- begin\n");
   if(pSensitiveDetector) pSensitiveDetector->Initialize(hcte);
   if(pMultiFunctionalDetector) pMultiFunctionalDetector->Initialize(hcte);
-  GateDebugMessageDec("SD",4,"GateMultiSenstiveDetector-- Initialize() -- end"<<G4endl);
+  GateDebugMessageDec("SD",4,"GateMultiSenstiveDetector-- Initialize() -- end\n");
 }
 //-----------------------------------------------------------------------------
 

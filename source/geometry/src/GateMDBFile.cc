@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -37,7 +37,7 @@ GateMDBFile::GateMDBFile(GateMaterialDatabase* db, const G4String& itsFileName)
 {
   GateMessage("Materials", 1, 
 	      "GateMDBFile: I start looking for the material database file <"
-	      << fileName << ">" << G4endl); 
+	      << fileName << ">\n"); 
   filePath = GateTools::FindGateFile(fileName);
   if (filePath.empty())
 	{
@@ -49,7 +49,7 @@ GateMDBFile::GateMDBFile(GateMaterialDatabase* db, const G4String& itsFileName)
   if (dbStream) {
     GateMessage("Materials", 2, 
 		"OK, I opened the material database <" 
-		<< filePath << ">" << G4endl);
+		<< filePath << ">\n");
   }
   else {
 		G4String msg = "Could not open material database file '" + filePath + "'";
@@ -67,6 +67,51 @@ GateMDBFile::~GateMDBFile()
 }
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// Read a new isotope from the DB file --> returns an isotope creator
+GateIsotopeCreator* GateMDBFile::ReadIsotope(const G4String& isotopeName)
+{
+  GateMessage("Materials", 5,
+	      "GateMDBFile<" << fileName
+	      << ">::ReadIsotope("
+	      << isotopeName <<")\n");
+
+  // Find the isotope definition line in the [Isotopes] section of the DB file
+  G4String line = ReadItem("Isotopes", isotopeName);
+  if (line == theReadItemErrorMsg)  return 0;
+
+  GateMessage("Materials", 5,
+	      "GateMDBFile<" << fileName
+	      << ">: found definition for isotope '"
+	      << isotopeName << "' as an elementary isotope.\n");
+
+  if (line == "")
+    DecodingException(isotopeName,"\tThe isotope's definition line seems to be empty\n");
+
+  // Create an empty isotope-creator
+  GateIsotopeCreator *creator = new GateIsotopeCreator(isotopeName);
+
+  // Read the 1st field as the isotope's atomic number (Z)
+  GateTokenizer::BrokenString stringPair = GateTokenizer::BreakString(line,theFieldSeparator);
+  creator->atomicNumber = ReadAtomicNumber(isotopeName,stringPair.first);
+
+  // Read the 2nd field as the element's nucleon number (N)
+  stringPair = GateTokenizer::BreakString(stringPair.second,theFieldSeparator);
+  creator->nucleonNumber = ReadNucleonNumber(isotopeName,stringPair.first);
+
+  // Read the 3rd field as the element's molar mass (A)
+  stringPair = GateTokenizer::BreakString(stringPair.second,theFieldSeparator);
+  creator->molarMass = ReadMolarMass(isotopeName,stringPair.first);
+
+  GateMessage("Materials", 5,
+	      "GateMDBFile<" << fileName
+	      << ": definition loaded for isotope '"
+	      << isotopeName <<"'.\n");
+
+  return creator;
+}
+//-----------------------------------------------------------------------------
+
 
 
 //-----------------------------------------------------------------------------
@@ -76,7 +121,7 @@ GateElementCreator* GateMDBFile::ReadElement(const G4String& elementName)
   GateMessage("Materials", 5, 
 	      "GateMDBFile<" << fileName 
 	      << ">::ReadElement(" 
-	      << elementName <<")" << G4endl);
+	      << elementName <<")\n");
 
   // Find the element definition line in the [Elements] section of the DB file
   G4String line = ReadItem("Elements",elementName);
@@ -85,13 +130,35 @@ GateElementCreator* GateMDBFile::ReadElement(const G4String& elementName)
   GateMessage("Materials", 5,  
 	      "GateMDBFile<" << fileName
 	      << ">: found definition for element '" 
-	      << elementName << "' as an elementary element." << G4endl);
+	      << elementName << "' as an elementary element.\n");
 
   if (line == "") 
     DecodingException(elementName,"\tThe element's definition line seems to be empty\n");
   
+  // Check the content of the first field to decide what kind of element it will be (scratch or compound)
+  GateTokenizer::BrokenString stringPair = GateTokenizer::BreakString(line,theFieldSeparator);
+  ElementType type = EvaluateElementType(elementName,stringPair.first);
+
+  // Launch the appropriate element readout function
+  switch (type) {
+  case elementtype_scratch:
+    return ReadScratchElement(elementName,line);
+  case elementtype_compound:
+    return ReadCompoundElement(elementName,line);
+  default:
+		G4String msg = "Abnormal prefix code found for the first field of element '" + elementName + "'";
+    G4Exception( "GateMDBFile::ReadElement", "ReadElement", FatalException, msg );
+  }
+  return 0;
+}
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+GateScratchElementCreator*  GateMDBFile::ReadScratchElement(const G4String& elementName,const G4String& line)
+{
   // Create an empty element-creator
-  GateElementCreator *creator = new GateElementCreator(elementName);
+  GateScratchElementCreator *creator = new GateScratchElementCreator(elementName);
   
   // Read the 1st field as the element's symbol
   GateTokenizer::BrokenString stringPair = GateTokenizer::BreakString(line,theFieldSeparator);  
@@ -108,7 +175,48 @@ GateElementCreator* GateMDBFile::ReadElement(const G4String& elementName)
   GateMessage("Materials", 5, 
 	      "GateMDBFile<" << fileName
 	      << ": definition loaded for element '" 
-	      << elementName <<"'." << G4endl);
+	      << elementName <<"'.\n");
+  return creator;
+}
+//-----------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------
+// Read a new compound element from the DB file --> returns a element creator
+GateCompoundElementCreator* GateMDBFile::ReadCompoundElement(const G4String& elementName,const G4String& line)
+{
+  GateMessage("Elements", 5,  "GateMDBFile<" << fileName
+	      <<">: found definition for element '"
+	      << elementName << "' as a compound element.\n");
+
+  // Create an empty element-creator
+  GateCompoundElementCreator *creator = new GateCompoundElementCreator(elementName);
+
+  // Read the 1st field as the number of components
+  GateTokenizer::BrokenString stringPair = GateTokenizer::BreakString(line,theFieldSeparator);
+  creator->nComponents = ReadNumberOfComponents(elementName,stringPair.first);
+
+  // Read the 2nd field as the symbol
+  stringPair = GateTokenizer::BreakString(stringPair.second,theFieldSeparator);
+  creator->symbol = ReadElementSymbol(elementName,stringPair.first);
+
+  GateMessage("Elements", 5,
+	      "GateMDBFile: element '"
+	      << elementName << "' has "
+	      << creator->nComponents << " components.\n");
+
+  // Read and store all element's components
+  for (G4int i=1;i<=creator->nComponents;i++) {
+    G4String componentOrdinal = CreateOrdinalString(i);
+    GateComponentCreator* componentCreator = ReadComponent(elementName,componentOrdinal);
+    creator->components.push_back(componentCreator);
+  }
+
+  GateMessage("Elements", 5,
+	      "GateMDBFile: definition loaded for material '"
+	      << elementName << "'.\n");
+
   return creator;
 }
 //-----------------------------------------------------------------------------
@@ -121,16 +229,16 @@ GateMaterialCreator* GateMDBFile::ReadMaterial(const G4String& materialName)
 {  
   GateMessage("Materials", 3, 
 	      "GateMDBFile<" << fileName 
-	      << ">::ReadMaterial(" << materialName<<")" << G4endl);
+	      << ">::ReadMaterial(" << materialName<<")\n");
 
   // Find the material definition line in the [Materials] section of the DB file
   G4String line = ReadItem("Materials",materialName);
   if (line == theReadItemErrorMsg) {
-    //GateMessage("Materials", 4, "GateMDBFile<"<<fileName<< ">::ReadMaterial("<< materialName<<") ReadError"<<G4endl);
+    //GateMessage("Materials", 4, "GateMDBFile<"<<fileName<< ">::ReadMaterial("<< materialName<<") ReadError\n");
     return 0;
   }
 
-  GateMessage("Materials", 4, "GateMDBFile<"<<fileName<< ">::ReadMaterial("<< materialName<<") found. "<<G4endl);
+  GateMessage("Materials", 4, "GateMDBFile<"<<fileName<< ">::ReadMaterial("<< materialName<<") found. \n");
 
   if (line == "") 
     DecodingException(materialName,"\tThe material's definition line seems to be empty\n");
@@ -160,7 +268,7 @@ GateScratchMaterialCreator* GateMDBFile::ReadScratchMaterial(const G4String& mat
 {
   GateMessage("Materials", 3, "GateMDBFile<" << fileName
 	      <<">: found definition for material '" 
-	      << materialName << "' as an elementary material.\n" << G4endl);
+	      << materialName << "' as an elementary material.\n\n");
   
   // Create an empty material-creator
   GateScratchMaterialCreator *creator = new GateScratchMaterialCreator(materialName);
@@ -182,7 +290,7 @@ GateScratchMaterialCreator* GateMDBFile::ReadScratchMaterial(const G4String& mat
 
   GateMessage("Materials", 3, 
 	      "GateMDBFile: definition loaded for material '" 
-	      << materialName << "'.\n" << G4endl);
+	      << materialName << "'.\n\n");
   return creator;
 }
 //-----------------------------------------------------------------------------
@@ -194,7 +302,7 @@ GateCompoundMaterialCreator* GateMDBFile::ReadCompoundMaterial(const G4String& m
 {
   GateMessage("Materials", 5,  "GateMDBFile<" << fileName
 	      <<">: found definition for material '" 
-	      << materialName << "' as a compound material." << G4endl);
+	      << materialName << "' as a compound material.\n");
   
   // Create an empty material-creator
   GateCompoundMaterialCreator *creator = new GateCompoundMaterialCreator(materialName);
@@ -210,7 +318,7 @@ GateCompoundMaterialCreator* GateMDBFile::ReadCompoundMaterial(const G4String& m
   GateMessage("Materials", 5, 
 	      "GateMDBFile: material '" 
 	      << materialName << "' has " 
-	      << creator->nComponents << " components." << G4endl);
+	      << creator->nComponents << " components.\n");
 
   // Process all other remaining fields (if any) to read the option data (state, density, pressure)
   ReadAllMaterialOptions(materialName,stringPair.second,creator);
@@ -224,7 +332,7 @@ GateCompoundMaterialCreator* GateMDBFile::ReadCompoundMaterial(const G4String& m
 
   GateMessage("Materials", 5, 
 	      "GateMDBFile: definition loaded for material '" 
-	      << materialName << "'." << G4endl);
+	      << materialName << "'.\n");
 
   return creator;
 }
@@ -256,9 +364,12 @@ GateComponentCreator* GateMDBFile::ReadComponent(const G4String& materialName,co
   case componenttype_mat:
     return ReadMatComponent(materialName,componentOrdinal,stringPair.second);
     break;
+  case componenttype_iso:
+    return ReadIsoComponent(materialName,componentOrdinal,stringPair.second);
+    break;
   default:
 		G4String msg = "Incorrect definition line for the  " +  componentOrdinal +  " component of the compound material '" + materialName + "'";
-		msg += " This line should start with '+el:' or '+mat:'. You should check the list of components in the database file for this material.";
+		msg += " This line should start with '+el:', '+mat:' or '+iso:'. You should check the list of components in the database file for this material.";
     G4Exception("GateMDBFile::ReadComponent", "ReadComponent" , FatalException, msg );
   }
   return 0;
@@ -307,7 +418,7 @@ GateEByNComponentCreator* GateMDBFile::ReadEByNComponent(const G4String& materia
   GateMessage("Materials", 5,  
 	      "GateMDBFile: " << componentOrdinal 
 	      << " component is the element '" << creator->name
-	      << "' (number of atoms= " << creator->nAtoms << ")" << G4endl);
+	      << "' (number of atoms= " << creator->nAtoms << ")\n");
   
   return creator;
 }
@@ -324,7 +435,7 @@ GateEByFComponentCreator* GateMDBFile::ReadEByFComponent(const G4String& materia
   GateMessage("Materials", 5,  
 	      "GateMDBFile: " << componentOrdinal 
 	      << " component is the element '" << creator->name
-	      << "' (fraction= " << creator->fraction << ")" << G4endl);
+	      << "' (fraction= " << creator->fraction << ")\n");
   
   return creator;
 }
@@ -351,11 +462,39 @@ GateMatComponentCreator* GateMDBFile::ReadMatComponent(const G4String& materialN
   GateMessage("Materials", 5,  
 	      "GateMDBFile: " << componentOrdinal 
 	      << " component is the material '" << creator->name
-	      << "' (fraction= " << creator->fraction << ")\n" << G4endl);
+	      << "' (fraction= " << creator->fraction << ")\n\n");
   
   return creator;
 }
 //-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// Read a new element-type material component for the current compound element
+GateIByFComponentCreator* GateMDBFile::ReadIsoComponent(const G4String& elementName,const G4String& componentOrdinal,const G4String& line)
+{
+  // Reads the 1st field (after the starter) as the component's name
+  GateTokenizer::BrokenString stringPair = GateTokenizer::BreakString(line,theFieldSeparator);
+  G4String name = ReadComponentName(elementName,componentOrdinal,stringPair.first);
+  if ( name == "auto" )
+    name = elementName;
+
+  // Create a creator
+  GateIByFComponentCreator* creator = new GateIByFComponentCreator(mDatabase,name);
+
+  // Read the component abundance (by fraction only)
+  stringPair = GateTokenizer::BreakString(stringPair.second,theFieldSeparator);
+  G4String field=stringPair.first;
+  creator->fraction = ReadComponentFraction(elementName,componentOrdinal,field);
+  GateMessage("Materials", 5,
+	      "GateMDBFile: " << componentOrdinal
+	      << " component is the element '" << creator->name
+	      << "' (fraction= " << creator->fraction << ")\n\n");
+
+  return creator;
+}
+//-----------------------------------------------------------------------------
+
 
 
 //-----------------------------------------------------------------------------
@@ -431,7 +570,7 @@ G4bool GateMDBFile::LookForText(const G4String& text)
     dbStream.clear();  
     dbStream.open(fileName);
     if (!dbStream) {
-      std::cerr << "ERROR Could not reopen " << fileName << std::endl;
+      std::cerr << "ERROR Could not reopen " << fileName << Gateendl;
       exit(0);
     }
   }
@@ -487,14 +626,14 @@ G4String GateMDBFile::ReadItem(const G4String& sectionName,const G4String& itemN
     // GateMessage("Materials", 3, "GateMDBFile<" << fileName
     // 		<< ">::ReadItem: I could NOT find the item '"
     // 		<< itemName << "' in section ["
-    // 		<< sectionName << "] of the material database. \n" << G4endl);
+    // 		<< sectionName << "] of the material database. \n\n");
     return theReadItemErrorMsg;
   }
 
   GateMessage("Materials", 2, "GateMDBFile<" << fileName
 	      << ">::ReadItem: I find the item '"
 	      << itemName << "' in section ["
-	      << sectionName << "] of the material database. \n" << G4endl);
+	      << sectionName << "] of the material database. \n\n");
 
   // We found the item: we return the text after the colon
   return lineBuf.substr(len);

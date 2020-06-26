@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -68,9 +68,12 @@ protected:
   G4UIcmdWithADoubleAndUnit * pSetEMin;
   G4UIcmdWithADoubleAndUnit * pSetEMax;
   G4UIcmdWithABool * pSetSplineFlag;
+#if G4VERSION_MAJOR >= 10 && G4VERSION_MINOR >= 5
+  G4UIcmdWithABool * pSetUseICRU90DataFlag;
+#endif
 
   // Mu Handler tools
-  G4UIcmdWithAString * pMuHandlerUsePrecalculatedElements;
+  G4UIcmdWithAString * pMuHandlerSetDatabase;
   G4UIcmdWithADoubleAndUnit * pMuHandlerSetEMin;
   G4UIcmdWithADoubleAndUnit * pMuHandlerSetEMax;
   G4UIcmdWithAnInteger * pMuHandlerSetENumber;

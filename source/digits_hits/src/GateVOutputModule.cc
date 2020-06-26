@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -35,5 +35,5 @@ GateVOutputModule::~GateVOutputModule()
 */
 void GateVOutputModule::Describe(size_t indent)
 {
-  G4cout << G4endl << GateTools::Indent(indent) << "Output module: '" << m_name << "'" << G4endl;
+  G4cout << Gateendl << GateTools::Indent(indent) << "Output module: '" << m_name << "'\n";
 }

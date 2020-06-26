@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #ifndef GATEPHYSICSLISTMESSENGER_CC
@@ -49,8 +49,11 @@ GatePhysicsListMessenger::~GatePhysicsListMessenger()
   delete pSetEMin;
   delete pSetEMax;
   delete pSetSplineFlag;
+#if G4VERSION_MAJOR >= 10 && G4VERSION_MINOR >= 5
+  delete pSetUseICRU90DataFlag;
+#endif
 
-  delete pMuHandlerUsePrecalculatedElements;
+  delete pMuHandlerSetDatabase;
   delete pMuHandlerSetEMin;
   delete pMuHandlerSetEMax;
   delete pMuHandlerSetENumber;
@@ -189,11 +192,18 @@ void GatePhysicsListMessenger::BuildCommands(G4String base)
   guidance = "Set SplineFlag for Standard EM Processes";
   pSetSplineFlag->SetGuidance(guidance);
 
+#if G4VERSION_MAJOR >= 10 && G4VERSION_MINOR >= 5
+  bb = base+"/setUseICRU90DataFlag";
+  pSetUseICRU90DataFlag = new G4UIcmdWithABool(bb,this);
+  guidance = "Use ICRU90 EM stopping power tables for protons and alphas in G4_AIR, G4_WATER and G4_GRAPHITE";
+  pSetUseICRU90DataFlag->SetGuidance(guidance);
+#endif
+
   // Mu Handler commands
-  bb = base+"/MuHandler/setElementFolderName";
-  pMuHandlerUsePrecalculatedElements = new G4UIcmdWithAString(bb,this);
-  guidance = "Point the folder where the Mu and Muen files per elements are stored";
-  pMuHandlerUsePrecalculatedElements->SetGuidance(guidance);
+  bb = base+"/MuHandler/setDatabase";
+  pMuHandlerSetDatabase = new G4UIcmdWithAString(bb,this);
+  guidance = "Set the mu/muen database. Available databases are 'NIST', 'EPDL' and 'simulated' The two first are tabulated (GateMuDatabase.hh) and the last one is simulated using the available physical processes.";
+  pMuHandlerSetDatabase->SetGuidance(guidance);
 
   bb = base+"/MuHandler/setEMin";
   pMuHandlerSetEMin = new G4UIcmdWithADoubleAndUnit(bb,this);
@@ -299,7 +309,7 @@ void GatePhysicsListMessenger::SetNewValue(G4UIcommand* command, G4String param)
 
   if (command == pPrint)
     {
-      char par1[30];
+      G4String par1;
       std::istringstream is(param);
       is >> par1;
       pPhylist->Write(par1);
@@ -310,8 +320,8 @@ void GatePhysicsListMessenger::SetNewValue(G4UIcommand* command, G4String param)
       pPhylist->GetCuts();
     }
 
-  char par1[30];
-  char par2[30];
+  G4String par1;
+  G4String par2;
   std::istringstream is(param);
   is >> par1 >> par2;
 
@@ -355,62 +365,69 @@ void GatePhysicsListMessenger::SetNewValue(G4UIcommand* command, G4String param)
   if (command == pSetDEDXBinning) {
     int nbBins = pSetDEDXBinning->GetNewIntValue(param);
     pPhylist->SetOptDEDXBinning(nbBins);
-    GateMessage("Physic", 1, "(EM Options) DEDXBinning set to "<<nbBins<<" bins. DEDXBinning defaut Value 84."<<G4endl);
+    GateMessage("Physic", 1, "(EM Options) DEDXBinning set to "<<nbBins<<" bins. DEDXBinning defaut Value 84.\n");
   }
   if (command == pSetLambdaBinning) {
     int nbBins = pSetLambdaBinning->GetNewIntValue(param);
     pPhylist->SetOptLambdaBinning(nbBins);
-    GateMessage("Physic", 1, "(EM Options) LambdaBinning set to "<<nbBins<<" bins. LambdaBinning defaut Value 84."<<G4endl);
+    GateMessage("Physic", 1, "(EM Options) LambdaBinning set to "<<nbBins<<" bins. LambdaBinning defaut Value 84.\n");
   }
   if (command == pSetEMin) {
     double val = pSetEMin->GetNewDoubleValue(param);
     pPhylist->SetOptEMin(val);
-    GateMessage("Physic", 1, "(EM Options) Min Energy set to "<<G4BestUnit(val,"Energy")<<". MinEnergy defaut Value 0.1keV."<<G4endl);
+    GateMessage("Physic", 1, "(EM Options) Min Energy set to "<<G4BestUnit(val,"Energy")<<". MinEnergy defaut Value 0.1keV.\n");
   }
   if (command == pSetEMax) {
     double val = pSetEMax->GetNewDoubleValue(param);
     pPhylist->SetOptEMax(val);
-    GateMessage("Physic", 1, "(EM Options) Max Energy set to "<<G4BestUnit(val,"Energy")<<". MaxEnergy defaut Value 100TeV."<<G4endl);
+    GateMessage("Physic", 1, "(EM Options) Max Energy set to "<<G4BestUnit(val,"Energy")<<". MaxEnergy defaut Value 100TeV.\n");
   }
   if (command == pSetSplineFlag) {
     G4bool flag = pSetSplineFlag->GetNewBoolValue(param);
     pPhylist->SetOptSplineFlag(flag);
-    GateMessage("Physic", 1, "(EM Options) Spline Falg set to "<<flag<<". Spline Flag defaut 1."<<G4endl);
+    GateMessage("Physic", 1, "(EM Options) Spline Flag set to "<<flag<<". Spline Flag defaut 1.\n");
   }
+#if G4VERSION_MAJOR >= 10 && G4VERSION_MINOR >= 5
+  if (command == pSetUseICRU90DataFlag) {
+    G4bool flag = pSetUseICRU90DataFlag->GetNewBoolValue(param);
+    pPhylist->SetUseICRU90DataFlag(flag);
+    GateMessage("Physic", 1, "(EM Options) 'Use the ICRU90 data' flag set to "<<flag<<". Defaut is 0 (false).\n");
+  }
+#endif
 
   // Mu Handler commands
-  if (command == pMuHandlerUsePrecalculatedElements){
-    nMuHandler->SetElementsFolderName(param);
+  if (command == pMuHandlerSetDatabase){
+    nMuHandler->SetDatabaseName(param);
   }
   if(command == pMuHandlerSetEMin){
     double val = pMuHandlerSetEMin->GetNewDoubleValue(param);
     nMuHandler->SetEMin(val);
-    GateMessage("Physic", 1, "(MuHandler Options) Min Energy set to "<<G4BestUnit(val,"Energy")<<". MinEnergy defaut Value: 250 eV."<<G4endl);
+    GateMessage("Physic", 1, "(MuHandler Options) Min Energy set to "<<G4BestUnit(val,"Energy")<<". MinEnergy defaut Value: 250 eV.\n");
   }
   if(command == pMuHandlerSetEMax){
     double val = pMuHandlerSetEMax->GetNewDoubleValue(param);
     nMuHandler->SetEMax(val);
-    GateMessage("Physic", 1, "(MuHandler Options) Max Energy set to "<<G4BestUnit(val,"Energy")<<". MaxEnergy defaut Value: 1 MeV."<<G4endl);
+    GateMessage("Physic", 1, "(MuHandler Options) Max Energy set to "<<G4BestUnit(val,"Energy")<<". MaxEnergy defaut Value: 1 MeV.\n");
   }
   if(command == pMuHandlerSetENumber){
     int nbVal = pMuHandlerSetENumber->GetNewIntValue(param);
     nMuHandler->SetENumber(nbVal);
-    GateMessage("Physic", 1, "(MuHandler Options) ENumber set to "<<nbVal<<" values. ENumber defaut Value: 25 between 250 eV and 1 MeV (logscale)."<<G4endl);
+    GateMessage("Physic", 1, "(MuHandler Options) ENumber set to "<<nbVal<<" values. ENumber defaut Value: 40 between 250 eV and 1 MeV (logscale).\n");
   }
   if(command == pMuHandlerSetAtomicShellEMin){
     double val = pMuHandlerSetAtomicShellEMin->GetNewDoubleValue(param);
     nMuHandler->SetAtomicShellEMin(val);
-    GateMessage("Physic", 1, "(MuHandler Options) Min Energy for atomic shell set to "<<G4BestUnit(val,"Energy")<<". MinEnergy defaut Value: 250 eV."<<G4endl);
+    GateMessage("Physic", 1, "(MuHandler Options) Min Energy for atomic shell set to "<<G4BestUnit(val,"Energy")<<". MinEnergy defaut Value: 250 eV.\n");
   }
   if(command == pMuHandlerSetPrecision){
     double val = pMuHandlerSetPrecision->GetNewDoubleValue(param);
     nMuHandler->SetPrecision(val);
-    GateMessage("Physic", 1, "(MuHandler Options) Precision set to "<<val<<". Precision defaut Value: 0.01"<<G4endl);
+    GateMessage("Physic", 1, "(MuHandler Options) Precision set to "<<val<<". Precision defaut Value: 0.01\n");
   }
 
   if (command == pAddAtomDeexcitation) {
     pPhylist->AddAtomDeexcitation();
-    GateMessage("Physic", 1, "Atom Deexcitation process has been added into the energy loss table manager"<<G4endl);
+    GateMessage("Physic", 1, "Atom Deexcitation process has been added into the energy loss table manager\n");
   }
 
   // Command to call G4 Physics List builders
@@ -429,7 +446,7 @@ void GatePhysicsListMessenger::SetNewValue(G4UIcommand* command, G4String param)
   if (command == pEnergyRangeMinLimitCmd) {
     double val = pEnergyRangeMinLimitCmd->GetNewDoubleValue(param);
     pPhylist->SetEnergyRangeMinLimit(val);
-    GateMessage("Physic", 1, "Min Energy range set to "<<G4BestUnit(val,"Energy") << G4endl);
+    GateMessage("Physic", 1, "Min Energy range set to "<<G4BestUnit(val,"Energy") << Gateendl);
   }
 
 }

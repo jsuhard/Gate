@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #ifndef GateTrpd_h
@@ -14,7 +14,6 @@
 #include "GateVVolume.hh"
 #include "GateVolumeManager.hh"
 
-#include "G4RunManager.hh"
 #include "G4VVisManager.hh"
 #include "G4Trd.hh"
 #include "G4Box.hh"

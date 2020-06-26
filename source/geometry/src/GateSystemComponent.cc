@@ -1,10 +1,10 @@
 /*----------------------
-   Copyright (C): OpenGATE Collaboration
+  Copyright (C): OpenGATE Collaboration
 
-This software is distributed under the terms
-of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
-----------------------*/
+  This software is distributed under the terms
+  of the GNU Lesser General  Public Licence (LGPL)
+  See LICENSE.md for further details
+  ----------------------*/
 
 
 #include "GateSystemComponent.hh"
@@ -22,6 +22,7 @@ See GATE/LICENSE.txt for further details
 #include "GateObjectChildList.hh"
 #include "GateLinearRepeater.hh"
 #include "GateAngularRepeater.hh"
+#include "GateGenericRepeater.hh"
 #include "GateSphereRepeater.hh"
 #include "GateSystemComponentList.hh"
 #include "GateObjectRepeaterList.hh"
@@ -30,13 +31,13 @@ See GATE/LICENSE.txt for further details
 //-------------------------------------------------------------------------------------------
 /* Constructor
 
-    itsName:       	  the name chosen for this system-component
-    itsMotherComponent:   the mother of the component (0 if top of a tree)
-    itsSystem:            the system to which the component belongs
-*/    
+   itsName:       	  the name chosen for this system-component
+   itsMotherComponent:   the mother of the component (0 if top of a tree)
+   itsSystem:            the system to which the component belongs
+*/
 GateSystemComponent::GateSystemComponent(const G4String& itsName,
       	      	      	      	      	 GateSystemComponent* itsMotherComponent,
-		      	      	      	 GateVSystem* itsSystem)
+                                         GateVSystem* itsSystem)
   : GateClockDependent( itsSystem->GetObjectName() + "/" + itsName,false),
     m_system(itsSystem),
     m_creator(0),
@@ -44,10 +45,10 @@ GateSystemComponent::GateSystemComponent(const G4String& itsName,
     m_motherComponent(itsMotherComponent)
 {
 
-//  G4cout << " DEBUT Constructeur GateSystemComponent" << G4endl;
-  
-//  G4cout << " mcreator(0)" << (m_creator) << G4endl;
-    
+  //  G4cout << " DEBUT Constructeur GateSystemComponent\n";
+
+  //  G4cout << " mcreator(0)" << (m_creator) << Gateendl;
+
   // If we have a mother, register ourself to it
   if (m_motherComponent)
     m_motherComponent->InsertChildComponent(this);
@@ -57,8 +58,8 @@ GateSystemComponent::GateSystemComponent(const G4String& itsName,
 
   // Create a new child list
   m_childComponentList = new GateSystemComponentList(this,GetObjectName()+"/daughters");
-  
-//  G4cout << " FIN Constructeur GateSystemComponent" << G4endl;
+
+  //  G4cout << " FIN Constructeur GateSystemComponent\n";
 }
 //-------------------------------------------------------------------------------------------
 
@@ -66,14 +67,14 @@ GateSystemComponent::GateSystemComponent(const G4String& itsName,
 
 //-------------------------------------------------------------------------------------------
 // Destructor
-GateSystemComponent::~GateSystemComponent() 
+GateSystemComponent::~GateSystemComponent()
 {
   // Delete the child list
   delete m_childComponentList;
 
   // Delete the messenger
   delete m_messenger;
-  
+
 }
 //-------------------------------------------------------------------------------------------
 
@@ -83,16 +84,16 @@ GateSystemComponent::~GateSystemComponent()
 /* Method overloading the base-class virtual method Describe().
    This methods prints-out a description of the component
 
-    indent: the print-out indentation (cosmetic parameter)
-*/    
+   indent: the print-out indentation (cosmetic parameter)
+*/
 void GateSystemComponent::Describe(size_t indent)
 {
   // Call the base-class class method
   GateClockDependent::Describe(indent);
 
   // List the creators attached to the system-component
-  G4cout << GateTools::Indent(indent) << "Attached to volume: " << ( m_creator ? m_creator->GetObjectName() : G4String("---") ) << G4endl;
-  
+  G4cout << GateTools::Indent(indent) << "Attached to volume: " << ( m_creator ? m_creator->GetObjectName() : G4String("---") ) << Gateendl;
+
   // Describe the tree of child-components
   m_childComponentList->DescribeChildComponents(indent,true);
 }
@@ -102,92 +103,92 @@ void GateSystemComponent::Describe(size_t indent)
 
 //-------------------------------------------------------------------------------------------
 /* Check whether an creator is connected to the component tree
-      	
-	anCreator: the creator we want to check
-	
-	returns true if the creator is attached to one of the components of the component-tree
-*/
-G4bool GateSystemComponent::CheckConnectionToCreator(GateVVolume* anCreator) 
-{ 
 
-//  G4cout << " DEBUT GateSystemComponent::CheckConnectionToCreator anCreator =  "  << anCreator->GetObjectName() << G4endl;
-//  G4cout << " m_creator name = " << m_creator << G4endl;
-   
-  
+   anCreator: the creator we want to check
+
+   returns true if the creator is attached to one of the components of the component-tree
+*/
+G4bool GateSystemComponent::CheckConnectionToCreator(GateVVolume* anCreator)
+{
+
+  //  G4cout << " DEBUT GateSystemComponent::CheckConnectionToCreator anCreator =  "  << anCreator->GetObjectName() << Gateendl;
+  //  G4cout << " m_creator name = " << m_creator << Gateendl;
+
+
   // Return true is we're directly connected to the creator
   if ( anCreator == m_creator )
     return true;
 
   // Return true if one of our children is connected (directly or indirectly) to the ancestor
   if ( m_childComponentList->CheckConnectionToCreator(anCreator) )
-      return true;
+    return true;
 
   // We're not connected to the creator, and none of our descendants is: return false
   return false;
 }
-//-------------------------------------------------------------------------------------------    
-    
-    
+//-------------------------------------------------------------------------------------------
+
+
 
 //-------------------------------------------------------------------------------------------
 // Attach am creator to the component, provided that the attachment request is valid
 // (calls IsValidAttachmentRequest() to check the request validity)
 void GateSystemComponent::SetCreator(GateVVolume* anCreator)
 {
-  //G4cout << " DEBUT GateSystemComponent::SetCreator" << G4endl;
-  
-  //G4cout << " 2 mcreator(0)" << (m_creator) << G4endl;
-  
+  //G4cout << " DEBUT GateSystemComponent::SetCreator\n";
+
+  //G4cout << " 2 mcreator(0)" << (m_creator) << Gateendl;
+
   // Verbose output
   if (nVerboseLevel){
-       G4cout   << "[" << GetObjectName() << "::SetInserter]:" << G4endl
-                << "\tReceived request for attachment of volume creator '" << anCreator->GetObjectName() << "' to this system-component" << G4endl;
+    G4cout   << "[" << GetObjectName() << "::SetInserter]:\n"
+             << "\tReceived request for attachment of volume creator '" << anCreator->GetObjectName() << "' to this system-component\n";
   }
-   
+
   // Check whether the creator is what we really need, i.e. an autoplaced creator
-//ancien  GateVVolume* creatorInserter = dynamic_cast<GateVVolume*>(anCreator);
+  //ancien  GateVVolume* creatorInserter = dynamic_cast<GateVVolume*>(anCreator);
 
   GateVVolume* creatorInserter = anCreator;
 
-  //G4cout << " =====> creatorInserter = " << creatorInserter->GetObjectName() << G4endl;
-  
+  //G4cout << " =====> creatorInserter = " << creatorInserter->GetObjectName() << Gateendl;
+
   if (!creatorInserter) {
-       G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:" << G4endl
-                << "\tThe creator is not a valid creator creator!" << G4endl << G4endl;
-      return;
+    G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
+             << "\tThe creator is not a valid creator creator!\n";
+    return;
   }
 
-   
+
   // We are now sure that we deal with an autoplaced creator
   // Check whether it's a valid one
-  
-  //G4cout << " =====> Check !IsValidAttachmentRequest(creatorInserter) = " << (!IsValidAttachmentRequest(creatorInserter)) << G4endl;
-  
 
- 
+  //G4cout << " =====> Check !IsValidAttachmentRequest(creatorInserter) = " << (!IsValidAttachmentRequest(creatorInserter)) << Gateendl;
+
+
+
   if (!IsValidAttachmentRequest(creatorInserter))  {
-       G4cerr   << "[" << GetObjectName() << "::SetInserter]:" << G4endl
-                << "\tIgnoring attachment request" << G4endl << G4endl;
-      return;
+    G4cerr   << "[" << GetObjectName() << "::SetInserter]:\n"
+             << "\tIgnoring attachment request\n";
+    return;
   }
 
-    
+
   // Everything's fine: set the creator pointer
   if (nVerboseLevel){
-      G4cout << "[" << GetObjectName() << "::SetInserter]:" << G4endl
-      	     << "\tAttaching volume creator '" << anCreator->GetObjectName() << "' to this component" << G4endl;}
+    G4cout << "[" << GetObjectName() << "::SetInserter]:\n"
+           << "\tAttaching volume creator '" << anCreator->GetObjectName() << "' to this component\n";}
 
-  //G4cout << " =====> m_creator = " << m_creator << G4endl;
-  
+  //G4cout << " =====> m_creator = " << m_creator << Gateendl;
+
   m_creator = creatorInserter;
-  //G4cout << " FIN GateSystemComponent::SetCreator" << G4endl;
+  //G4cout << " FIN GateSystemComponent::SetCreator\n";
 
 }
 //-------------------------------------------------------------------------------------------
 
 
 
-//-------------------------------------------------------------------------------------------    
+//-------------------------------------------------------------------------------------------
 // Tells whether an creator may be attached to this component
 // This virtual method makes a number of tests: is the creator pointer valid,
 // does the creator owns a movement-list, does it own a repeater-list...
@@ -195,62 +196,62 @@ void GateSystemComponent::SetCreator(GateVVolume* anCreator)
 G4bool GateSystemComponent::IsValidAttachmentRequest(GateVVolume* anCreator) const
 {
 
-  // G4cout << " DEBUT GateSystemComponent::IsValidAttachmentRequest" << G4endl;
-   
-   
-  // G4cout << " 3 mcreator(0)" << (m_creator) << G4endl;
-   
+  // G4cout << " DEBUT GateSystemComponent::IsValidAttachmentRequest\n";
+
+
+  // G4cout << " 3 mcreator(0)" << (m_creator) << Gateendl;
+
   // Check that the creator pointer is valid
   if (!anCreator) {
-       G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:" << G4endl
-                << "\tThe creator is null!" << G4endl << G4endl;
-      return false;
-  }
-
-  //G4cout << " Test1" << G4endl;
-  
-  // Disrecard the request if an creator is already attached to us
-  if (m_creator ) {
-      G4cerr << "[" << GetObjectName() << "::IsValidAttachmentRequest]:" << G4endl
-      	     << "\tA volume creator ('" << m_creator->GetObjectName() << "') is already attached to this system component" << G4endl << G4endl;
-      return false;
-  }
-
-//G4cout << " Test2" << G4endl;
-  // Check that there is no inter-system conflict 
-  // (i.e. that the creator is not already attached to another system)
-  GateVSystem* creatorSystem = GateSystemListManager::GetInstance()->FindSystemOfCreator(anCreator);
-  
-  //G4cout << " Test22" << G4endl;
- 
-  if (creatorSystem)
-    if ( creatorSystem != GetSystem() ) {
-      G4cerr  << "[" << GetObjectName() << "::IsValidAttachmentRequest]:" << G4endl
-      	      << "\tThe volume creator '" << anCreator->GetObjectName() << "' or one of its ancestors is already attached to another system ('" 
-	      << creatorSystem->GetObjectName() << "')" << G4endl << G4endl;
+    G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
+             << "\tThe creator is null!\n";
     return false;
   }
-//G4cout << " Test3" << G4endl;
-  // Check that the creator owns a movement list 
+
+  //G4cout << " Test1\n";
+
+  // Disrecard the request if an creator is already attached to us
+  if (m_creator ) {
+    G4cerr << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
+           << "\tA volume creator ('" << m_creator->GetObjectName() << "') is already attached to this system component\n";
+    return false;
+  }
+
+  //G4cout << " Test2\n";
+  // Check that there is no inter-system conflict
+  // (i.e. that the creator is not already attached to another system)
+  GateVSystem* creatorSystem = GateSystemListManager::GetInstance()->FindSystemOfCreator(anCreator);
+
+  //G4cout << " Test22\n";
+
+  if (creatorSystem)
+    if ( creatorSystem != GetSystem() ) {
+      G4cerr  << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
+      	      << "\tThe volume creator '" << anCreator->GetObjectName() << "' or one of its ancestors is already attached to another system ('"
+              << creatorSystem->GetObjectName() << "')\n";
+      return false;
+    }
+  //G4cout << " Test3\n";
+  // Check that the creator owns a movement list
   GateObjectRepeaterList* moveList = anCreator->GetMoveList();
   if (!moveList) {
-       G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:" << G4endl
-                << "\tThe creator '" << anCreator->GetObjectName() << "' can not be displaced!" << G4endl << G4endl;
-      return false;
+    G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
+             << "\tThe creator '" << anCreator->GetObjectName() << "' can not be displaced!\n";
+    return false;
   }
-//G4cout << " Test4" << G4endl;
-  // Check that the creator owns a repeater list 
+  //G4cout << " Test4\n";
+  // Check that the creator owns a repeater list
   GateObjectRepeaterList* repeaterList = anCreator->GetRepeaterList();
   if (!repeaterList) {
-       G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:" << G4endl
-                << "\tThe creator '" << anCreator->GetObjectName() << "' can not be repeated!" << G4endl << G4endl;
-      return false;
+    G4cerr   << "[" << GetObjectName() << "::IsValidAttachmentRequest]:\n"
+             << "\tThe creator '" << anCreator->GetObjectName() << "' can not be repeated!\n";
+    return false;
   }
-  //G4cout << " FIN GateSystemComponent::IsValidAttachmentRequest" << G4endl;
+  //G4cout << " FIN GateSystemComponent::IsValidAttachmentRequest\n";
   // OK, everything's fine
   return true;
 }
-//-------------------------------------------------------------------------------------------   
+//-------------------------------------------------------------------------------------------
 
 
 
@@ -276,10 +277,10 @@ G4VPhysicalVolume* GateSystemComponent::GetPhysicalVolume(size_t copyNumber) con
 
 //-------------------------------------------------------------------------------------------
 // Returns the translation vector for one of the physical volumes created by the creator
-const G4ThreeVector& GateSystemComponent::GetCurrentTranslation(size_t copyNumber) const
+G4ThreeVector GateSystemComponent::GetCurrentTranslation(size_t copyNumber) const
 {
   static G4ThreeVector defaultPosition;
-  
+
   G4VPhysicalVolume* aVolume = GetPhysicalVolume(copyNumber);
   return aVolume ? aVolume->GetTranslation() : defaultPosition;
 }
@@ -301,8 +302,8 @@ G4RotationMatrix* GateSystemComponent::GetCurrentRotation(size_t copyNumber) con
 //-------------------------------------------------------------------------------------------
 // The function returns the creator's placement move, if one can be find was found in the creator's move list
 GateVolumePlacement* GateSystemComponent::FindPlacementMove() const
-{ 
-  return FindMove<GateVolumePlacement>(); 
+{
+  return FindMove<GateVolumePlacement>();
 }
 //-------------------------------------------------------------------------------------------
 
@@ -350,10 +351,10 @@ GateEccentRotMove* GateSystemComponent::FindEccentRotMove() const
 
 //-------------------------------------------------------------------------------------------
 // The function returns the creator's translation velocity, if a translation can be find was found in the creator's move list
-const G4ThreeVector& GateSystemComponent::GetTranslationVelocity() const
+G4ThreeVector GateSystemComponent::GetTranslationVelocity() const
 {
   static const G4ThreeVector defaultVelocity;
-  
+
   GateTranslationMove* aMove = FindTranslationMove();
   return aMove ? aMove->GetVelocity() : defaultVelocity;
 }
@@ -408,21 +409,21 @@ const G4ThreeVector& GateSystemComponent::GetEccentRotShift() const
 
 //-------------------------------------------------------------------------------------------
 /* Compute the offset (displacement) between a feature of the creator and a feature of its mother creator
-    
-    By default, all alignments are set to align_center, so that we compute the offset between the creator's center 
-    and the center of its mother's reference frame
-    We could select align_left for both alignments: in that case, we would compute the offset between the left edge
-    of the creator and the left edge of its mother
-    To compute an internal ring diameter from a block position, we actually select align_left for the block and
-    align_center for its mother: thus, we compute the distance between the block's left edge and its mother's center
-    
-    axis: 	      	      the axis along which we want to compute the offset
-    alignment:    	      the feature of the creator for which we want to compute the offset
-	      	      	      it can be its center (align_center), its left border (align_left) or its right border (align_right)
-    referenceAlignment:       the feature of the mother volume, with regards to which we compute the offset
-	      	      	      it can be its center (align_center), its left border (align_left) or its right border (align_right)
 
-    Returns the offset along the requested axis between the creator's feature considered and the mother's feature considered
+   By default, all alignments are set to align_center, so that we compute the offset between the creator's center
+   and the center of its mother's reference frame
+   We could select align_left for both alignments: in that case, we would compute the offset between the left edge
+   of the creator and the left edge of its mother
+   To compute an internal ring diameter from a block position, we actually select align_left for the block and
+   align_center for its mother: thus, we compute the distance between the block's left edge and its mother's center
+
+   axis: 	      	      the axis along which we want to compute the offset
+   alignment:    	      the feature of the creator for which we want to compute the offset
+   it can be its center (align_center), its left border (align_left) or its right border (align_right)
+   referenceAlignment:       the feature of the mother volume, with regards to which we compute the offset
+   it can be its center (align_center), its left border (align_left) or its right border (align_right)
+
+   Returns the offset along the requested axis between the creator's feature considered and the mother's feature considered
 */
 G4double GateSystemComponent::ComputeOffset(size_t axis,Alignment1D alignment,Alignment1D referenceAlignment) const
 {
@@ -435,7 +436,7 @@ G4double GateSystemComponent::ComputeOffset(size_t axis,Alignment1D alignment,Al
 
   // Get the volume half-size
   G4double halfLength = m_creator->GetCreator()->GetHalfDimension(axis);
-  
+
   // Get the volume's mother half-dimensize
   GateVVolume* motherCreator = m_creator->GetMotherCreator();
   if (!motherCreator)
@@ -456,20 +457,26 @@ G4double GateSystemComponent::ComputeOffset(size_t axis,Alignment1D alignment,Al
 // Compute the total number of volumes handled by the 'younger' sister-components
 G4int GateSystemComponent::ComputeOutputOffset()
 {
-    if ( !m_motherComponent )
-      return 0;
+  if ( !m_motherComponent )
+    return 0;
 
-    G4int result =0;
-    
-    // Loop in the mother's daughter list until we find the requested daughter
-    size_t i = 0;
-    while ( m_motherComponent->GetChildComponent(i) != this )
+  G4int result =0;
+
+  // Loop in the mother's daughter list until we find the requested daughter
+  // dangerous!! can lead to an infinite loop
+  size_t i = 0;
+  while ( m_motherComponent->GetChildComponent(i) != this )
     {
       result += m_motherComponent->GetChildComponent(i)->GetVolumeNumber();
       ++i;
     }
+  //variant, Is this correct?? Is there more than one instance of children per list component??
+  //for (size_t i = 0; i<m_motherComponent->GetChildNumber(); i++)
+  //if ( m_motherComponent->GetChildComponent(i) == this )
+	//return m_motherComponent->GetChildComponent(i)->GetVolumeNumber();
 
-    return result;
+  return result;
+  //return 0;
 }
 //-------------------------------------------------------------------------------------------
 
@@ -514,7 +521,7 @@ G4int GateSystemComponent::GetLinearRepeatNumber()
 const G4ThreeVector& GateSystemComponent::GetLinearRepeatVector()
 {
   static const G4ThreeVector theDefaultRepeatVector;
-  
+
   GateLinearRepeater* repeater = FindLinearRepeater();
   return repeater ? repeater->GetRepeatVector() : theDefaultRepeatVector;
 }
@@ -549,7 +556,7 @@ G4double GateSystemComponent::GetAngularRepeatPitch()
 {
   GateAngularRepeater* repeater = FindAngularRepeater();
   return repeater ? ((repeater->GetAngularSpan() == 360. * degree) ?
-		     repeater->GetAngularPitch_1() : repeater->GetAngularPitch_2())
+                     repeater->GetAngularPitch_1() : repeater->GetAngularPitch_2())
     : 360. * degree;
 }
 //-------------------------------------------------------------------------------------------
@@ -572,25 +579,25 @@ G4int GateSystemComponent::GetAngularModuloNumber()
 G4double GateSystemComponent::GetAngularRepeatZShift1()
 {GateAngularRepeater* repeater = FindAngularRepeater(); return repeater ? repeater->GetZShift1() : 0. ; }
 
-G4double GateSystemComponent::GetAngularRepeatZShift2()						     
+G4double GateSystemComponent::GetAngularRepeatZShift2()
 {GateAngularRepeater* repeater = FindAngularRepeater(); return repeater ? repeater->GetZShift2() : 0.; }
 
-G4double GateSystemComponent::GetAngularRepeatZShift3()						     
+G4double GateSystemComponent::GetAngularRepeatZShift3()
 {GateAngularRepeater* repeater = FindAngularRepeater(); return repeater ? repeater->GetZShift3() : 0.; }
 
-G4double GateSystemComponent::GetAngularRepeatZShift4()						     
+G4double GateSystemComponent::GetAngularRepeatZShift4()
 {GateAngularRepeater* repeater = FindAngularRepeater(); return repeater ? repeater->GetZShift4() : 0.; }
 
-G4double GateSystemComponent::GetAngularRepeatZShift5()						     
+G4double GateSystemComponent::GetAngularRepeatZShift5()
 {GateAngularRepeater* repeater = FindAngularRepeater(); return repeater ? repeater->GetZShift5() : 0.; }
 
-G4double GateSystemComponent::GetAngularRepeatZShift6()						     
+G4double GateSystemComponent::GetAngularRepeatZShift6()
 {GateAngularRepeater* repeater = FindAngularRepeater(); return repeater ? repeater->GetZShift6() : 0.; }
 
-G4double GateSystemComponent::GetAngularRepeatZShift7()						     
+G4double GateSystemComponent::GetAngularRepeatZShift7()
 {GateAngularRepeater* repeater = FindAngularRepeater(); return repeater ? repeater->GetZShift7() : 0.; }
 
-G4double GateSystemComponent::GetAngularRepeatZShift8()						     
+G4double GateSystemComponent::GetAngularRepeatZShift8()
 {GateAngularRepeater* repeater = FindAngularRepeater(); return repeater ? repeater->GetZShift8() : 0.; }
 
 // Finds the first sphere-repeater in the creator's repeater list
@@ -602,7 +609,7 @@ GateSphereRepeater* GateSystemComponent::FindSphereRepeater()
 
 
 //-------------------------------------------------------------------------------------------
-// Finds the first sphere-repeater's repeat axial pitch 
+// Finds the first sphere-repeater's repeat axial pitch
 G4double GateSystemComponent::GetSphereAxialRepeatPitch()
 {
   GateSphereRepeater* repeater = FindSphereRepeater();
@@ -613,7 +620,7 @@ G4double GateSystemComponent::GetSphereAxialRepeatPitch()
 
 
 //-------------------------------------------------------------------------------------------
-// Finds the first sphere-repeater's repeat azimuthal pitch 
+// Finds the first sphere-repeater's repeat azimuthal pitch
 G4double GateSystemComponent::GetSphereAzimuthalRepeatPitch()
 {
   GateSphereRepeater* repeater = FindSphereRepeater();
@@ -654,55 +661,79 @@ G4double GateSystemComponent::GetSphereRadius()
 }
 //-------------------------------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------------------------------
+// Finds the first generic repeater in the creator's repeater list
+GateGenericRepeater* GateSystemComponent::FindGenericRepeater()
+{
+  return FindRepeater<GateGenericRepeater>();
+}
+//-------------------------------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------------------------------
+// Finds the first linear-repeater's repeat number
+G4int GateSystemComponent::GetGenericRepeatNumber()
+{
+  GateGenericRepeater* repeater = FindGenericRepeater();
+  return repeater ? repeater->GetRepeatNumber() : 1;
+}
+//-------------------------------------------------------------------------------------------
+
+
+
 void GateSystemComponent::setInCoincidenceWith(G4String aRsectorName )
 {
   size_t pos = GetObjectName().rfind( "/");
   G4String thename = GetObjectName().substr( pos + 1);
-  G4cout << " my name is  " << thename<<G4endl;
-   if ( thename ==  aRsectorName ) return;
+  G4cout << " my name is  " << thename<< Gateendl;
+  if ( thename ==  aRsectorName ) return;
 
 
-      G4cout << " GateSystemComponent::setInCoincidenceWith  entered  for " <<GetObjectName()<< G4endl;
-      G4cout << " rsector name parameter " << aRsectorName<<G4endl;
+  G4cout << " GateSystemComponent::setInCoincidenceWith  entered  for " <<GetObjectName()<< Gateendl;
+  G4cout << " rsector name parameter " << aRsectorName<< Gateendl;
 
-   if ( m_coincidence_rsector.empty() != 1 )
+  if ( m_coincidence_rsector.empty() != 1 )
     {
-       std::vector<G4String>::iterator it;
-       G4cout << " vector is not empty  looking for " << aRsectorName<< G4endl;
-       G4cout << " it contains " <<G4endl;
-       for (size_t i = 0; i < m_coincidence_rsector.size(); i++ ) G4cout << m_coincidence_rsector[i]<<"  ";       G4cout<<G4endl;
-       it = std::find( m_coincidence_rsector.begin() , m_coincidence_rsector.end
-() , aRsectorName );
-       if ( it == m_coincidence_rsector.end() )        {
-         GateSystemComponent* theComponent = m_system->FindBoxCreatorComponent( 
-aRsectorName );
-         if ( theComponent != 0 )
-         { size_t pos = GetObjectName().rfind( "/");           G4String thename = GetObjectName().substr( pos + 1);
-          m_coincidence_rsector.push_back(aRsectorName);           theComponent->setInCoincidenceWith( thename );
-           for (size_t i = 0; i < m_coincidence_rsector.size(); i++ )theComponent
-->setInCoincidenceWith( m_coincidence_rsector[i] );
-           G4cout<<"GateSystemComponent::setInCoincidenceWith() :: setting " << 
-thename<< " in coincidence with " << aRsectorName <<G4endl;
-         }         else G4cout<<"GateSystemComponent::setInCoincidenceWith() :: WARNING Component named " <<aRsectorName<<" was not found. Ignored.";
-        } else { G4cout << "already found  exiting "<<G4endl;return; }
+      std::vector<G4String>::iterator it;
+      G4cout << " vector is not empty  looking for " << aRsectorName<< Gateendl;
+      G4cout << " it contains \n";
+      for (size_t i = 0; i < m_coincidence_rsector.size(); i++ )
+        G4cout << m_coincidence_rsector[i]<<"  ";
+      G4cout<< Gateendl;
+      it = std::find( m_coincidence_rsector.begin() , m_coincidence_rsector.end
+                      () , aRsectorName );
+      if ( it == m_coincidence_rsector.end() )        {
+        GateSystemComponent* theComponent = m_system->FindBoxCreatorComponent(aRsectorName );
+        if ( theComponent != 0 )
+          { size_t pos = GetObjectName().rfind( "/");           G4String thename = GetObjectName().substr( pos + 1);
+            m_coincidence_rsector.push_back(aRsectorName);           theComponent->setInCoincidenceWith( thename );
+            for (size_t i = 0; i < m_coincidence_rsector.size(); i++ )theComponent
+                                                                        ->setInCoincidenceWith( m_coincidence_rsector[i] );
+            G4cout<<"GateSystemComponent::setInCoincidenceWith() :: setting " <<
+              thename<< " in coincidence with " << aRsectorName << Gateendl;
+          }         else G4cout<<"GateSystemComponent::setInCoincidenceWith() :: WARNING Component named " <<aRsectorName<<" was not found. Ignored.";
+      } else { G4cout << "already found  exiting \n";return; }
     }     else
-           { G4cout << " vector is empty  looking for " << aRsectorName<< G4endl
-;
-            GateSystemComponent* theComponent = m_system->FindBoxCreatorComponent( aRsectorName );
-            if ( theComponent != 0 )
-             {size_t pos = GetObjectName().rfind( "/");
-              G4String thename = GetObjectName().substr( pos + 1 );
-             m_coincidence_rsector.push_back( aRsectorName );
-             G4cout<<"GateSystemComponent::setInCoincidenceWith() :: setting " <<thename << " in coincidence with " << aRsectorName <<G4endl;             theComponent->setInCoincidenceWith( thename );
-             }
-             else G4cout<<"GateSystemComponent::setInCoincidenceWith() :: WARNING Component named " <<aRsectorName<<" was not found. Ignored."<<G4endl;
-           }
-	}
+    { G4cout << " vector is empty  looking for " << aRsectorName<< Gateendl
+        ;
+      GateSystemComponent* theComponent = m_system->FindBoxCreatorComponent( aRsectorName );
+      if ( theComponent != 0 )
+        {size_t pos = GetObjectName().rfind( "/");
+          G4String thename = GetObjectName().substr( pos + 1 );
+          m_coincidence_rsector.push_back( aRsectorName );
+          G4cout<<"GateSystemComponent::setInCoincidenceWith() :: setting " <<thename << " in coincidence with " << aRsectorName << Gateendl;             theComponent->setInCoincidenceWith( thename );
+        }
+      else G4cout<<"GateSystemComponent::setInCoincidenceWith() :: WARNING Component named " <<aRsectorName<<" was not found. Ignored.\n";
+    }
+}
 
 
 G4int GateSystemComponent::IsInCoincidenceWith(G4String aRsectorName )
 {
-   if ( m_coincidence_rsector.empty() != 1 )
+  if ( m_coincidence_rsector.empty() != 1 )
     {
       std::vector<G4String>::iterator it;
       it = std::find( m_coincidence_rsector.begin() , m_coincidence_rsector.end() , aRsectorName );

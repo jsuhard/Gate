@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -46,7 +46,7 @@ void GateTranslationMoveMessenger::SetNewValue(G4UIcommand* command,G4String new
 { 
   if( command==TranslationVelocityCmd )
     { 
-     G4cout << "Translation speed = " << newValue << G4endl;
+     G4cout << "Translation speed = " << newValue << Gateendl;
      GetTranslationMove()->SetVelocity(TranslationVelocityCmd->GetNew3VectorValue(newValue));}      
   
   else 

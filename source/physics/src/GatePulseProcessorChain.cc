@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -27,21 +27,26 @@ GatePulseProcessorChain::GatePulseProcessorChain( GateDigitizer* itsDigitizer,
     m_outputName(itsOutputName),
     m_inputName(GateHitConvertor::GetOutputAlias())
 {
-//  G4cout << " DEBUT Constructor GatePulseProcessorChain " << G4endl;
+//  G4cout << " DEBUT Constructor GatePulseProcessorChain \n";
   m_messenger = new GatePulseProcessorChainMessenger(this);
 
-//  G4cout << " in GatePulseProcessorChain call GateSingleDigiMaker" << G4endl;
+//  G4cout << " in GatePulseProcessorChain call GateSingleDigiMaker\n";
   itsDigitizer->InsertDigiMakerModule( new GateSingleDigiMaker(itsDigitizer, itsOutputName,true) );
   
-//  G4cout << " FIN Constructor GatePulseProcessorChain " << G4endl;
+//  G4cout << " FIN Constructor GatePulseProcessorChain \n";
 }
 
 
 
 
 GatePulseProcessorChain::~GatePulseProcessorChain()
-{  
-    delete m_messenger;
+{
+  for (auto processor = theListOfNamedObject.begin(); processor != theListOfNamedObject.end(); ++processor)
+  {
+    GateMessage("Core", 5, "~GatePulseProcessorChain -- delete module: " << (*processor)->GetObjectName() << Gateendl );
+    delete (*processor);
+  }
+  delete m_messenger;
 }
 
 
@@ -57,13 +62,13 @@ void GatePulseProcessorChain::InsertProcessor(GateVPulseProcessor* newChildProce
 void GatePulseProcessorChain::Describe(size_t indent)
 {
   GateModuleListManager::Describe();
-  G4cout << GateTools::Indent(indent) << "Input:              '" << m_inputName << "'" << G4endl;
-  G4cout << GateTools::Indent(indent) << "Output:             '" << m_outputName << "'" << G4endl;
+  G4cout << GateTools::Indent(indent) << "Input:              '" << m_inputName << "'\n";
+  G4cout << GateTools::Indent(indent) << "Output:             '" << m_outputName << "'\n";
 }
 
 void GatePulseProcessorChain::DescribeProcessors(size_t indent)
 {
-  G4cout << GateTools::Indent(indent) << "Nb of modules:       " << theListOfNamedObject.size() << G4endl;
+  G4cout << GateTools::Indent(indent) << "Nb of modules:       " << theListOfNamedObject.size() << Gateendl;
   for (size_t i=0; i<theListOfNamedObject.size(); i++)
       GetProcessor(i)->Describe(indent+1);
 }

@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #include "GateHitConvertor.hh"
@@ -63,14 +63,23 @@ GatePulseList* GateHitConvertor::ProcessHits(const GateCrystalHitsCollection* hi
   for (i=0;i<n_hit;i++) {
         if (nVerboseLevel>1)
       		G4cout << "[GateHitConvertor::ProcessHits]: processing hit[" << i << "]\n";
-      	ProcessOneHit( (*hitCollection)[i], pulseList);
+
+        if((*hitCollection)[i]->GetEdep()==0){
+            if (nVerboseLevel>1)
+                G4cout << "[GateHitConvertor::ProcessOneHit]: energy is null for " << *(*hitCollection)[i] << " -> hit ignored\n\n";
+        }
+        else{
+            ProcessOneHit( (*hitCollection)[i], pulseList);
+        }
+
+
   }
 
-  if (nVerboseLevel==1) {
+ if (nVerboseLevel>1) {
       G4cout << "[GateHitConvertor::ProcessHits]: returning pulse-list with " << pulseList->size() << " entries\n";
       for (i=0; i<pulseList->size(); i++)
-      	G4cout << *((*pulseList)[i]) << G4endl;
-      G4cout << G4endl;
+        G4cout << *((*pulseList)[i]) << Gateendl;
+      G4cout << Gateendl;
   }
 
   GateDigitizer::GetInstance()->StorePulseList(pulseList);
@@ -79,19 +88,54 @@ GatePulseList* GateHitConvertor::ProcessHits(const GateCrystalHitsCollection* hi
   return pulseList;
 }
 
+
+ GatePulseList* GateHitConvertor::ProcessHits(std::vector<GateCrystalHit*> vhitCollection){
+
+    size_t n_hit = vhitCollection.size();
+    if (nVerboseLevel==1)
+        G4cout << "[GateHitConvertor::ProcessHits]: "
+                  "processing hit-collection with " << n_hit << " entries\n";
+    if (!n_hit)
+      return 0;
+
+    GatePulseList* pulseList = new GatePulseList(GetObjectName());
+
+    size_t i;
+    for (i=0;i<n_hit;i++) {
+          if (nVerboseLevel>1)
+              G4cout << "[GateHitConvertor::ProcessHits]: processing hit[" << i << "]\n";
+          //Here no problem
+         // ProcessOneHit( (std::make_shared<GateCrystalHit>(vhitCollection.at(i))).get(), pulseList);
+          ProcessOneHit(vhitCollection.at(i), pulseList);
+    }
+
+   if (nVerboseLevel==1) {
+        G4cout << "[GateHitConvertor::ProcessHits]: returning pulse-list with " << pulseList->size() << " entries\n";
+        for (i=0; i<pulseList->size(); i++)
+          G4cout << *((*pulseList)[i]) << Gateendl;
+        G4cout << Gateendl;
+    }
+
+    GateDigitizer::GetInstance()->StorePulseList(pulseList);
+    GateDigitizer::GetInstance()->StorePulseListAlias(GetOutputAlias(),pulseList);
+
+    return pulseList;
+}
+
 void GateHitConvertor::ProcessOneHit(const GateCrystalHit* hit,GatePulseList* pulseList)
 {
- if (hit->GetEdep()==0) {
+ /*if (hit->GetEdep()==0) {
     if (nVerboseLevel>1)
       	G4cout << "[GateHitConvertor::ProcessOneHit]: energy is null for " << *hit << " -> hit ignored\n\n";
     return;
-  }
+  }*/
 
   GatePulse* pulse = new GatePulse(hit);
 
   pulse->SetRunID( hit->GetRunID() );
 
-  	//  G4cout << "HitConvertor : runID = " << hit->GetRunID() << G4endl;
+      //G4cout << "HitConvertor : eventID = " << hit->GetEventID() << Gateendl;
+      //G4cout << "HitConvertor : edep = " << hit->GetEdep() << Gateendl;
 
 
   pulse->SetEventID( hit->GetEventID() );
@@ -117,6 +161,23 @@ void GateHitConvertor::ProcessOneHit(const GateCrystalHit* hit,GatePulseList* pu
 #endif
   pulse->SetNSeptal( hit->GetNSeptal() );  // HDS : septal penetration
 
+  // AE : Added for IdealComptonPhot adder which take into account several Comptons in the same volume
+  pulse->SetPostStepProcess(hit->GetPostStepProcess());
+  pulse->SetEnergyIniTrack(hit->GetEnergyIniTrack());
+  pulse->SetEnergyFin(hit->GetEnergyFin());
+  pulse->SetProcessCreator(hit->GetProcess());
+  pulse->SetTrackID(hit->GetTrackID());
+  pulse->SetParentID(hit->GetParentID());
+  pulse->SetSourceEnergy(hit->GetSourceEnergy());
+  pulse->SetSourcePDG(hit->GetSourcePDG());
+  pulse->SetNCrystalConv( hit->GetNCrystalConv() );
+
+
+    
+//-------------------------------------------------
+     
+
+
   if (hit->GetComptonVolumeName().empty()) {
     pulse->SetComptonVolumeName( "NULL" );
     pulse->SetSourceID( -1 );
@@ -128,15 +189,15 @@ void GateHitConvertor::ProcessOneHit(const GateCrystalHit* hit,GatePulseList* pu
   }
 
   if (nVerboseLevel>1)
-      	G4cout << "[GateHitConvertor::ProcessOneHit]: " << G4endl
-	       << "\tprocessed " << *hit << G4endl
-	       << "\tcreated new pulse:" << G4endl
-	       << *pulse << G4endl;
+      	G4cout << "[GateHitConvertor::ProcessOneHit]: \n"
+	       << "\tprocessed " << *hit << Gateendl
+	       << "\tcreated new pulse:\n"
+	       << *pulse << Gateendl;
 
   pulseList->push_back(pulse);
 }
 
 void GateHitConvertor::DescribeMyself(size_t indent)
 {
-  G4cout << GateTools::Indent(indent) << "Convert hits into pulses for '" << GateDigitizer::GetInstance()->GetObjectName() << "'" << G4endl;
+  G4cout << GateTools::Indent(indent) << "Convert hits into pulses for '" << GateDigitizer::GetInstance()->GetObjectName() << "'\n";
 }

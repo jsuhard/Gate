@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -35,6 +35,7 @@ public:
   void SetPlacementsFilename(std::string filename);
   void EnableRelativeTranslation(bool b) { mUseRelativeTranslation = b; }
   void SetPlacementList(std::vector<GatePlacement> l);
+  G4int GetRepeatNumber() { return (G4int)mPlacementsList.size(); };
 
 protected:
   GateGenericRepeaterMessenger* mMessenger; 

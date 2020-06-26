@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -23,7 +23,7 @@ GateVCoincidencePulseProcessor::GateVCoincidencePulseProcessor(GateCoincidencePu
 {
   GateDigitizer* digitizer = GateDigitizer::GetInstance();
 
-  G4cout << " in GateVCoincidencePulseProcessor call new GateCoincidenceDigiMaker" << G4endl;
+  G4cout << " in GateVCoincidencePulseProcessor call new GateCoincidenceDigiMaker\n";
   digitizer->InsertDigiMakerModule( new GateCoincidenceDigiMaker(digitizer, itsName,false) );
 }
 //------------------------------------------------------------------------------------------------------
@@ -36,8 +36,8 @@ GateVCoincidencePulseProcessor::GateVCoincidencePulseProcessor(GateCoincidencePu
 void GateVCoincidencePulseProcessor::Describe(size_t indent) 
 {
   GateClockDependent::Describe(indent);
-  G4cout << GateTools::Indent(indent) << "Attached to:        '" << GetChain()->GetObjectName() << "'" << G4endl;
-  G4cout << GateTools::Indent(indent) << "Output:             '" << GetObjectName() << "'" << G4endl;
+  G4cout << GateTools::Indent(indent) << "Attached to:        '" << GetChain()->GetObjectName() << "'\n";
+  G4cout << GateTools::Indent(indent) << "Output:             '" << GetObjectName() << "'\n";
   DescribeMyself(indent);
 }
 //------------------------------------------------------------------------------------------------------    

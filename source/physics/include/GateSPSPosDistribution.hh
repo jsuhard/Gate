@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 /* ----------------------------------------------------------------------------- *
@@ -30,19 +30,19 @@ class GateSPSPosDistribution : public G4SPSPosDistribution
  public :
  
   GateSPSPosDistribution () ;
-  ~GateSPSPosDistribution () ;
+  virtual ~GateSPSPosDistribution () ;
   
   void GeneratePositronRange() ;
   void SetPositronRange( G4String ) ;
   
   void ForbidSourceToVolume(const G4String&);
   
-  G4ThreeVector GenerateOne() ;
+  virtual G4ThreeVector GenerateOne() ;
   
   void setVerbosity( G4int );
 
   inline G4ThreeVector GetPositionVector()
-  {return particle_position;}
+    {return particle_position;}
 
  private :
   

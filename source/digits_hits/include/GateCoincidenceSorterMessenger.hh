@@ -1,9 +1,9 @@
 /*----------------------
    Copyright (C): OpenGATE Collaboration
-
+   
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -26,45 +26,50 @@ class GateCoincidenceSorter;
 
 /*! \class  GateCoincidenceSorterMessenger
     \brief  Messenger used for commanding a  GateCoincidenceSorter
-
+    
     - GateCoincidenceSorterMessenger - by Daniel.Strul@iphe.unil.ch
-
+    
     - This messenger inherits from the abilities and responsabilities of the
       GateClockDependentMessenger base class: creation of a command directory,
       with various commands ('describe', 'verbose', 'enable', 'disable', 'setWindow')
-
+      
     - In addition, it provides commands for settings the parameters of a cylindrical
       scanner's coincidence sorter: 'setWindow', 'minSectorDifference'
-
+      
     \sa GateCoincidenceSorter
 */
 //    Last modification in 12/2011 by Abdul-Fattah.Mohamad-Hadi@subatech.in2p3.fr, for the multi-system approach.
+//    Modified 01/2016 by Jared.STRYDHORST@cea.fr to add control of the presort buffer size
 
 class GateCoincidenceSorterMessenger: public GateClockDependentMessenger
 {
-  public:
+public:
     //! Constructor
     GateCoincidenceSorterMessenger(GateCoincidenceSorter* itsCoincidenceSorter);
     //! Destructor
     ~GateCoincidenceSorterMessenger();
-
+    
     //! UI command interpreter
     inline void SetNewValue(G4UIcommand* aCommand, G4String aString);
-
+    
     //! Return a pointer to the coincidence-sorter
     inline GateCoincidenceSorter* GetCoincidenceSorter()
-      { return (GateCoincidenceSorter*) GetClockDependent(); }
-
-  private:
+    { return (GateCoincidenceSorter*) GetClockDependent(); }
+    
+private:
     G4UIcmdWithADoubleAndUnit   *windowCmd;          //!< the UI command 'setWindow'
     G4UIcmdWithADoubleAndUnit   *offsetCmd;          //!< the UI command 'setOffset'
     G4UIcmdWithADoubleAndUnit   *windowJitterCmd;    //!< the UI command 'setWindowJitter'
     G4UIcmdWithADoubleAndUnit   *offsetJitterCmd;    //!< the UI command 'setOffsetJitter'
     G4UIcmdWithAnInteger        *minSectorDiffCmd;   //!< the UI command 'minSectorDifference'
     G4UIcmdWithAnInteger        *setDepthCmd;        //!< the UI command 'setDepth'
+    G4UIcmdWithAnInteger        *setPresortBufferSizeCmd;  //!< the UI command 'setPresortBufferSize'
     G4UIcmdWithAString          *SetInputNameCmd;    //!< The UI command "set input name"
-    G4UIcmdWithAString          *MultiplePolicyCmd;  //!< The UI command "allowMultiples"
+    G4UIcmdWithAString          *MultiplePolicyCmd;  //!< The UI command "MultiplesPolicy"
     G4UIcmdWithABool            *AllPulseOpenCoincGateCmd;  //!< The UI command "allowMultiples"
+    G4UIcmdWithABool            *SetTriggerOnlyByAbsorberCmd;
+    
+    
 };
 
 #endif

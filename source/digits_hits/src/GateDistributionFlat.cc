@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -57,7 +57,7 @@ G4double GateDistributionFlat::Value(G4double x) const
 //___________________________________________________________________
 G4double GateDistributionFlat::ShootRandom() const
 {
-    return (m_Min + (m_Max - m_Min)*G4UniformRand());
+    return G4RandFlat::shoot(m_Min, m_Max);
 }
 //___________________________________________________________________
 void GateDistributionFlat::DescribeMyself(size_t indent)
@@ -66,5 +66,5 @@ void GateDistributionFlat::DescribeMyself(size_t indent)
     	 <<"Min : "         << m_Min
          <<"  -- Max : "    << m_Max
          <<"  -- Amplitude : "<< m_Amplitude
-	 <<G4endl;
+	 << Gateendl;
 }

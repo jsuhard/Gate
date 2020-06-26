@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -99,14 +99,6 @@ class GateQuantumEfficiency : public GateVPulseProcessor
     //! It is is called by ProcessPulseList() for each of the input pulses
     //! The result of the pulse-processing is incorporated into the output pulse-list
     void ProcessOnePulse(const GatePulse* inputPulse,GatePulseList& outputPulseList);
-
-  private:
-    //! Give a random number included between 0 and 1
-    G4double MonteCarloEngine();
-    //! Give a random integer included between 'a and 'b
-    size_t MonteCarloInt(size_t a,size_t b);
-    //! Give a random number included between 'a and 'b
-    G4double MonteCarloG4double(G4double a,G4double b);
 
   private:
     //! Static pointer to the GateQuantumEfficiency singleton

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -31,8 +31,10 @@ GateCoincidencePulseProcessorChain::GateCoincidencePulseProcessorChain( GateDigi
 {
   
   m_messenger = new GateCoincidencePulseProcessorChainMessenger(this);
+  //name of your chain
+   //G4cout<<"GateCoincidencePulseProcessor m_outputName="<<m_outputName<<G4endl;
 
-  G4cout << " in GateCoincidencePulseProcessorChain call new GateCoincidenceDigiMaker "  << G4endl;
+  G4cout << " in GateCoincidencePulseProcessorChain call new GateCoincidenceDigiMaker "  << Gateendl;
   itsDigitizer->InsertDigiMakerModule( new GateCoincidenceDigiMaker(itsDigitizer, itsOutputName,true) );
 }
 //------------------------------------------------------------------------------------------------------
@@ -58,8 +60,8 @@ void GateCoincidencePulseProcessorChain::InsertProcessor(GateVCoincidencePulsePr
 void GateCoincidencePulseProcessorChain::Describe(size_t indent)
 {
   GateModuleListManager::Describe();
-  //G4cout << GateTools::Indent(indent) << "Input:              '" << m_inputNames << "'" << G4endl;
-  G4cout << GateTools::Indent(indent) << "Output:             '" << m_outputName << "'" << G4endl;
+  //G4cout << GateTools::Indent(indent) << "Input:              '" << m_inputNames << "'\n";
+  G4cout << GateTools::Indent(indent) << "Output:             '" << m_outputName << "'\n";
 }
 //------------------------------------------------------------------------------------------------------
 
@@ -67,7 +69,7 @@ void GateCoincidencePulseProcessorChain::Describe(size_t indent)
 //------------------------------------------------------------------------------------------------------
 void GateCoincidencePulseProcessorChain::DescribeProcessors(size_t indent)
 {
-  G4cout << GateTools::Indent(indent) << "Nb of modules:       " << theListOfNamedObject.size() << G4endl;
+  G4cout << GateTools::Indent(indent) << "Nb of modules:       " << theListOfNamedObject.size() << Gateendl;
   for (size_t i=0; i<theListOfNamedObject.size(); i++)
       GetProcessor(i)->Describe(indent+1);
 }
@@ -118,8 +120,12 @@ void GateCoincidencePulseProcessorChain::ProcessCoincidencePulses()
 
   //mhadi_add[
   for (size_t processorID = 0 ; processorID < GetProcessorNumber(); processorID++) 
-     if (GetProcessor(processorID)->IsEnabled() && GetProcessor(processorID)->IsTriCoincProcessor())
-        GetProcessor(processorID)->CollectSingles();
+  {
+    GateVCoincidencePulseProcessor* processor =  GetProcessor(processorID);
+    if (processor->IsEnabled() && processor->IsTriCoincProcessor())
+        processor->CollectSingles();
+    
+  }
   //mhadi_add]
         
   if (pulseList.empty())
@@ -132,14 +138,17 @@ void GateCoincidencePulseProcessorChain::ProcessCoincidencePulses()
      GateCoincidencePulse* pulse = *it;
      if (pulse->empty()) continue;
      for (size_t processorID = 0 ; processorID < GetProcessorNumber(); processorID++) {
-       if (GetProcessor(processorID)->IsEnabled()) {
-	 pulse = GetProcessor(processorID)->ProcessPulse(pulse,i);
+       GateVCoincidencePulseProcessor* processor =  GetProcessor(processorID);
+       if (processor->IsEnabled()) {
+	 pulse = processor->ProcessPulse(pulse,i);
 	 if (pulse){
-      	   pulse->SetName(GetProcessor(processorID)->GetObjectName());
+	   //G4cout<<"processorName="<<processor->GetObjectName()<<G4endl;
+      	   pulse->SetName(processor->GetObjectName());
       	   GateDigitizer::GetInstance()->StoreCoincidencePulse(pulse);
 	 } else break;
        }
      }
+      //G4cout<<"CoincChain m_outputName="<<m_outputName<<G4endl;
      if (pulse) GateDigitizer::GetInstance()->StoreCoincidencePulseAlias(m_outputName,pulse);
    }
 
@@ -152,12 +161,13 @@ void GateCoincidencePulseProcessorChain::ProcessCoincidencePulses()
 GateVSystem* GateCoincidencePulseProcessorChain::FindSystem(G4String& inputName)
 {
    GateDigitizer* digitizer = GateDigitizer::GetInstance();
+   std::vector<GateCoincidenceSorter*> CoincidenceSorterList = digitizer->GetCoinSorterList();
 
-   G4int index = -1;
+   /*G4int index = -1;
 
-   for(size_t i=0; i<digitizer->GetCoinSorterList().size(); i++)
+   for(size_t i=0; i<CoincidenceSorterList.size(); i++)
    {
-      G4String coincSorterChainName = digitizer->GetCoinSorterList()[i]->GetOutputName();
+      G4String coincSorterChainName = CoincidenceSorterList[i]->GetOutputName();
       if(inputName.compare(coincSorterChainName) == 0)
       {
          index = i;
@@ -167,8 +177,15 @@ GateVSystem* GateCoincidencePulseProcessorChain::FindSystem(G4String& inputName)
 
    GateVSystem* system = 0;
    if(index != -1)
-      system = digitizer->GetCoinSorterList()[index]->GetSystem();
+      system = CoincidenceSorterList[index]->GetSystem();
    
-   return system;
+   return system;*/
+   
+   //faster!!
+   for (std::vector<GateCoincidenceSorter*>::iterator itr=CoincidenceSorterList.begin(); itr!=CoincidenceSorterList.end(); itr++)
+     if (inputName.compare((*itr)->GetOutputName()) == 0)
+       return (*itr)->GetSystem();
+   
+   return 0;
 }
 //mhadi_add]

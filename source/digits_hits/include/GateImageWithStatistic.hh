@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 /*
@@ -33,6 +33,9 @@ class GateImageWithStatistic
   // void SetLastHitEventImage(GateImage * lastHitEventImage) { mLastHitEventImage = lastHitEventImage; }
   void SetResolutionAndHalfSize(const G4ThreeVector & resolution, const G4ThreeVector & halfSize);
   void SetResolutionAndHalfSize(const G4ThreeVector & resolution, const G4ThreeVector & halfSize, const G4ThreeVector & position);
+  void SetResolutionAndHalfSizeCylinder(const G4ThreeVector & resolution, const G4ThreeVector & halfSize);
+  void SetResolutionAndHalfSizeCylinder(const G4ThreeVector & resolution, const G4ThreeVector & halfSize, const G4ThreeVector & position);
+
   void Allocate();
   void Reset(double val=0.0);
 
@@ -59,19 +62,20 @@ class GateImageWithStatistic
   virtual void UpdateSquaredImage();
   virtual void UpdateUncertaintyImage(int numberOfEvents);
 
-  GateImage & GetValueImage() { return mValueImage; }
+  GateVImage & GetValueImage() { return mValueImage; }
+  GateVImage & GetUncertaintyImage() { return mUncertaintyImage; }
 
   void SetOrigin(G4ThreeVector v);
   void SetOverWriteFilesFlag(bool b) { mOverWriteFilesFlag = b; }
   void SetTransformMatrix(const G4RotationMatrix & m);
 
   protected:
-  GateImage mValueImage;
-  GateImage mSquaredImage;
-  GateImage mTempImage;
-  GateImage mUncertaintyImage;
-  GateImage mScaledValueImage;
-  GateImage mScaledSquaredImage;
+  GateImageDouble mValueImage;
+  GateImageDouble mSquaredImage;
+  GateImageDouble mTempImage;
+  GateImageDouble mUncertaintyImage;
+  GateImageDouble mScaledValueImage;
+  GateImageDouble mScaledSquaredImage;
   bool mOverWriteFilesFlag;
   bool mNormalizedToMax;
   bool mNormalizedToIntegral;

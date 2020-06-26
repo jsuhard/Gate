@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 /*
@@ -20,13 +20,16 @@ See GATE/LICENSE.txt for further details
 //-----------------------------------------------------------------------------
 GateProductionAndStoppingActor::GateProductionAndStoppingActor(G4String name, G4int depth):
   GateVImageActor(name,depth) {
-  GateDebugMessageInc("Actor",4,"GateProductionAndStoppingActor() -- begin"<<G4endl);
+  GateDebugMessageInc("Actor",4,"GateProductionAndStoppingActor() -- begin\n");
 
   mCurrentEvent=-1;
 
-  pMessenger = new GateImageActorMessenger(this);
+  pMessenger = new GateProductionAndStoppingActorMessenger(this);
 
-  GateDebugMessageDec("Actor",4,"GateProductionAndStoppingActor() -- end"<<G4endl);
+  GateDebugMessageDec("Actor",4,"GateProductionAndStoppingActor() -- end\n");
+
+  bEnableCoordFrame=false;
+  bCoordFrame = " ";
 }
 //-----------------------------------------------------------------------------
 
@@ -34,15 +37,15 @@ GateProductionAndStoppingActor::GateProductionAndStoppingActor(G4String name, G4
 //-----------------------------------------------------------------------------
 /// Destructor
 GateProductionAndStoppingActor::~GateProductionAndStoppingActor()  {
-  GateDebugMessageInc("Actor",4,"~GateProductionAndStoppingActor() -- begin"<<G4endl);
-  GateDebugMessageDec("Actor",4,"~GateProductionAndStoppingActor() -- end"<<G4endl);
+  GateDebugMessageInc("Actor",4,"~GateProductionAndStoppingActor() -- begin\n");
+  GateDebugMessageDec("Actor",4,"~GateProductionAndStoppingActor() -- end\n");
 }
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
 /// Construct
 void GateProductionAndStoppingActor::Construct() {
-  GateDebugMessageInc("Actor", 4, "GateProductionAndStoppingActor -- Construct - begin" << G4endl);
+  GateDebugMessageInc("Actor", 4, "GateProductionAndStoppingActor -- Construct - begin\n");
   GateVImageActor::Construct();
 
   // Enable callbacks
@@ -60,6 +63,9 @@ void GateProductionAndStoppingActor::Construct() {
   SetOriginTransformAndFlagToImage(mProdImage);
   SetOriginTransformAndFlagToImage(mStopImage);
 
+/*TODO BRENT
+  if (customfr) mProdImage.SetTransformMatrix(RxM);*/
+
   mProdImage.EnableSquaredImage(false);
   mProdImage.EnableUncertaintyImage(false);
   mProdImage.SetResolutionAndHalfSize(mResolution, mHalfSize, mPosition);
@@ -73,7 +79,7 @@ void GateProductionAndStoppingActor::Construct() {
   mStopImage.SetFilename(mStopFilename);
 
   ResetData();
-  GateMessageDec("Actor", 4, "GateProductionAndStoppingActor -- Construct - end" << G4endl);
+  GateMessageDec("Actor", 4, "GateProductionAndStoppingActor -- Construct - end\n");
 }
 //-----------------------------------------------------------------------------
 
@@ -96,7 +102,7 @@ void GateProductionAndStoppingActor::ResetData() {
 
 //-----------------------------------------------------------------------------
 void GateProductionAndStoppingActor::BeginOfRunAction(const G4Run * ) {
-  GateDebugMessage("Actor", 3, "GateProductionAndStoppingActor -- Begin of Run" << G4endl);
+  GateDebugMessage("Actor", 3, "GateProductionAndStoppingActor -- Begin of Run\n");
   ResetData();
 }
 //-----------------------------------------------------------------------------
@@ -105,7 +111,7 @@ void GateProductionAndStoppingActor::BeginOfRunAction(const G4Run * ) {
 // Callback at each event
 void GateProductionAndStoppingActor::BeginOfEventAction(const G4Event * ) {
   mCurrentEvent++;
-  GateDebugMessage("Actor", 3, "GateProductionAndStoppingActor -- Begin of Event: "<<mCurrentEvent << G4endl);
+  GateDebugMessage("Actor", 3, "GateProductionAndStoppingActor -- Begin of Event: "<<mCurrentEvent << Gateendl);
 }
 //-----------------------------------------------------------------------------
 

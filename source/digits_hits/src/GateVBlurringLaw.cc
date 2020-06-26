@@ -3,11 +3,11 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 #include "GateVBlurringLaw.hh"
-
+#include "GateMessageManager.hh"
 
 /*! \class  GateVBlurringLaw
     \brief  Abstract class for the law giving the energy resolution
@@ -40,6 +40,6 @@ GateVBlurringLaw::GateVBlurringLaw(const G4String& itsName) :
 void GateVBlurringLaw::Describe (size_t ident) {
 	GateNamedObject::Describe(ident);
 
-	G4cout << "Law giving the energy resolution functions of the energy." << G4endl;
+	G4cout << "Law giving the energy resolution functions of the energy.\n";
 	DescribeMyself(ident);
 }

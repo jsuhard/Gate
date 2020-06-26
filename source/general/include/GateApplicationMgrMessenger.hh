@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -49,7 +49,7 @@ private:
   G4UIcmdWithoutParameter*   StopDAQCmd;
   G4UIcmdWithoutParameter*   PauseDAQCmd;
   G4UIcmdWithAnInteger*      VerboseCmd;
-  G4UIcmdWithABool*          ExitFlagCmd;
+//  G4UIcmdWithABool*          ExitFlagCmd;
   G4UIcmdWithoutParameter*   DescribeCmd;
 
   G4UIcmdWithoutParameter * NoOutputCmd;
@@ -60,6 +60,10 @@ private:
   G4UIcmdWithADouble *      SetTotalNumberOfPrimariesCmd;
   G4UIcmdWithADouble *      SetNumberOfPrimariesPerRunCmd;
   G4UIcmdWithADouble *      SetNumberOfPrimariesPerRunCmd2;
+
+//LSLS
+  G4UIcmdWithAString *      ReadNumberOfPrimariesInAFileCmd;
+
 };
 
 #endif

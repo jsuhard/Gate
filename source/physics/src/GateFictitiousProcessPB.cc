@@ -3,11 +3,12 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 #include "GateFictitiousProcessPB.hh"
 #include "G4FastSimulationManagerProcess.hh"
+#include "G4SystemOfUnits.hh"
 
 #include "GateEMStandardProcessMessenger.hh"
 
@@ -49,7 +50,7 @@ void GateFictitiousProcessPB::ConstructProcess(G4ProcessManager * manager)
   settings->RegisterTotalDiscreteProcess ( ((GateTotalDiscreteProcess*)GetProcess()),false );
   if ( !model->SetParameters ( settings ) )
   {
-    G4cout << "WARNING! FictitiousFastSimulationModel set but not all other commands applied (this might be the case if physics commands are used before volume definition)." << G4endl;
+    G4cout << "WARNING! FictitiousFastSimulationModel set but not all other commands applied (this might be the case if physics commands are used before volume definition).\n";
   }
 }
 //-----------------------------------------------------------------------------

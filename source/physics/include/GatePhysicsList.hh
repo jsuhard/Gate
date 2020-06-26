@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
 
   Modified version 11-10-13 for physics mixed with dna
   Author: LPC Clermont-Fd
@@ -13,14 +13,14 @@
 #ifndef GATEPHYSICSLIST_HH
 #define GATEPHYSICSLIST_HH
 
-#include "G4VUserPhysicsList.hh"
+#include "G4VModularPhysicsList.hh"
 #include "G4StepLimiter.hh"
 #include "G4UserSpecialCuts.hh"
 #include "G4EmCalculator.hh"
 #include "G4ProductionCutsTable.hh"
 #include "G4UnitsTable.hh"
 #include "G4ProductionCuts.hh"
-#include "G4EmProcessOptions.hh"
+#include "G4EmParameters.hh"
 
 #include "GateMessageManager.hh"
 #include "GateVProcess.hh"
@@ -28,7 +28,7 @@
 
 //class GateVProcess;
 class GatePhysicsListMessenger;
-class GatePhysicsList: public G4VUserPhysicsList
+class GatePhysicsList: public G4VModularPhysicsList
 {
 private:
   GatePhysicsList();
@@ -48,10 +48,10 @@ public:
   static GatePhysicsList *GetInstance() { // static function must be here or icc, not in cc
     if (singleton == 0)
       {
-        //std::cout << "creating PhysicscList..." << std::endl;
+        //std::cout << "creating PhysicscList...\n";
         singleton = new GatePhysicsList;
       }
-    //else std::cout << "PhysicscList already created!" << std::endl;
+    //else std::cout << "PhysicscList already created!\n";
     return singleton;
   }
   virtual ~GatePhysicsList();
@@ -90,6 +90,9 @@ public:
   void SetOptEMin(G4double val);
   void SetOptEMax(G4double val);
   void SetOptSplineFlag(G4bool val);
+#if G4VERSION_MAJOR >= 10 && G4VERSION_MINOR >= 5
+  void SetUseICRU90DataFlag(G4bool val);
+#endif
   RegionCutMapType & GetMapOfRegionCuts() { return mapOfRegionCuts; }
   G4double GetLowEdgeEnergy();
 
@@ -114,18 +117,21 @@ protected:
   double mEmin;
   double mEmax;
   bool mSplineFlag;
+#if G4VERSION_MAJOR >= 10 && G4VERSION_MINOR >= 5
+  bool mUseICRU90Data;
+#endif
   G4UserLimits * userlimits;
 
   // Physic list management
-  G4VUserPhysicsList * mUserPhysicList;
+  G4VModularPhysicsList * mUserPhysicList;
   //Mixed EM and DNA Physics List
-  G4VUserPhysicsList* emPhysicsListMixed;
+  G4VModularPhysicsList* emPhysicsListMixed;
 
   G4String mUserPhysicListName;
   G4String mListOfPhysicsLists;
   G4double mLowEnergyRangeLimit;
 
-  G4EmProcessOptions *opt;
+  G4EmParameters *emPar;
 };
 
 

@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -44,55 +44,39 @@ GateVProcess::~GateVProcess()
   theListOfModels.clear();
   theListOfSelectedDataSets.clear();
 
-  for (std::vector<G4ParticleDefinition*>::iterator it = theListOfEnabledParticles.begin(); it != theListOfEnabledParticles.end(); )
-    {
-      it = theListOfEnabledParticles.erase(it);
-    }
-  for (std::vector<G4ParticleDefinition*>::iterator it = theListOfParticlesWithSelectedDS.begin(); it != theListOfParticlesWithSelectedDS.end(); )
-    {
-      it = theListOfParticlesWithSelectedDS.erase(it);
-    }
-  for (std::vector<G4ParticleDefinition*>::iterator it = theListOfParticlesWithSelectedModels.begin(); it != theListOfParticlesWithSelectedModels.end(); )
-    {
-      it = theListOfParticlesWithSelectedModels.erase(it);
-    }
+  for (std::vector<G4ParticleDefinition*>::iterator it = theListOfEnabledParticles.begin();
+       it != theListOfEnabledParticles.end(); ) {
+    it = theListOfEnabledParticles.erase(it);
+  }
+  for (std::vector<G4ParticleDefinition*>::iterator it = theListOfParticlesWithSelectedDS.begin();
+       it != theListOfParticlesWithSelectedDS.end(); ) {
+    it = theListOfParticlesWithSelectedDS.erase(it);
+  }
+  for (std::vector<G4ParticleDefinition*>::iterator it = theListOfParticlesWithSelectedModels.begin();
+       it != theListOfParticlesWithSelectedModels.end(); ) {
+    it = theListOfParticlesWithSelectedModels.erase(it);
+  }
 
-  for (std::vector<GateListOfHadronicModels*>::iterator it = theListOfSelectedModels.begin(); it != theListOfSelectedModels.end(); )
-    {
-      delete (*it);
-      it = theListOfSelectedModels.erase(it);
-    }
+  for (std::vector<GateListOfHadronicModels*>::iterator it = theListOfSelectedModels.begin();
+       it != theListOfSelectedModels.end(); ) {
+    delete (*it);
+    it = theListOfSelectedModels.erase(it);
+  }
 
-  //for(std::map<G4String,GenericWrapperProcess*>::iterator iter = theListOfWrapper.begin(); iter!=theListOfWrapper.end(); )
-  //{
-  //  if((*iter).second!=0) delete (*iter).second;
-  //  theListOfWrapper.erase(iter);
-  //}
-
-  for(std::list<G4HadronicInteraction*>::iterator i = theListOfG4HadronicModels.begin(); i!=theListOfG4HadronicModels.end(); i++)
-    {
-      delete (*i);
-      i = theListOfG4HadronicModels.erase(i);
-    }
+  for(std::list<G4HadronicInteraction*>::iterator i = theListOfG4HadronicModels.begin();
+      i!=theListOfG4HadronicModels.end(); i++) {
+    delete (*i);
+    i = theListOfG4HadronicModels.erase(i);
+  }
 
   delete theHandler;
   delete pMessenger;
 
-  for(std::list<G4VProcess*>::iterator i = theListOfG4Processes.begin(); i!=theListOfG4Processes.end(); i++)
-    {
-      if(*i!=0) delete (*i);
-      i = theListOfG4Processes.erase(i);
-    }
+  for(std::list<G4VProcess*>::iterator i = theListOfG4Processes.begin();
+      i!=theListOfG4Processes.end(); i++) {
+    i = theListOfG4Processes.erase(i);
+  }
 
-  /*std::cout<<"Process= "<<mG4ProcessName<<std::endl;
-    if(pFinalProcess==pProcess && pProcess) {
-    std::cout<<"----> "<<pFinalProcess<<"  "<<pProcess <<std::endl;
-    delete pFinalProcess; pFinalProcess=0;pProcess=0;
-    std::cout<<"<----"<<std::endl;}
-    else {
-    if(pFinalProcess) {delete pFinalProcess; pFinalProcess=0;}
-    if(pProcess)  {delete pProcess;pProcess=0;}
-    }*/
   pFinalProcess=0;pProcess=0;
   GateDebugMessageDec("Physic",4,"~GateVProcess -- end");
 }
@@ -102,19 +86,19 @@ GateVProcess::~GateVProcess()
 //-----------------------------------------------------------------------------
 void GateVProcess::Delete()
 {
-  for (std::vector<GateVProcess*>::iterator it = GetTheListOfProcesses()->begin(); it != GetTheListOfProcesses()->end(); )
-    {
-      (*it)->kill();
-
-      it = GetTheListOfProcesses()->erase(it);
-    }
+  for (std::vector<GateVProcess*>::iterator it = GetTheListOfProcesses()->begin();
+       it != GetTheListOfProcesses()->end(); ) {
+    (*it)->kill();
+    it = GetTheListOfProcesses()->erase(it);
+  }
 }
 //-----------------------------------------------------------------------------
 
 
 
 //-----------------------------------------------------------------------------
-void GateVProcess::Register(){
+void GateVProcess::Register()
+{
   GetTheListOfProcesses()->push_back(this);
 }
 //-----------------------------------------------------------------------------
@@ -157,10 +141,10 @@ void GateVProcess::ConstructProcess()
                 if(theListOfParticlesWithSelectedModels[j]==theListOfEnabledParticles[k])
                   {
                     GateDebugMessage("Physic",2,"AddModel start - "<< theListOfSelectedModels[j]->GetModelName()
-                                     <<"  -   "<< theListOfEnabledParticles[k]->GetParticleName()   <<G4endl);
+                                     <<"  -   "<< theListOfEnabledParticles[k]->GetParticleName()   << Gateendl);
 
                     AddModel(theListOfSelectedModels[j]);
-                    GateDebugMessage("Physic",2,"AddModel end"<<G4endl);
+                    GateDebugMessage("Physic",2,"AddModel end\n");
                   }
             }
 
@@ -184,7 +168,7 @@ void GateVProcess::ConstructProcess()
 
           if (theListOfWrapperFactor[particle] || theListOfWrapperCSEFactor[particle]) //((GetIsWrapperActive() || GetIsCSEActive()) &&
             {
-              //G4cout<<"INIT  "<<pProcess->GetProcessName()<<"  "<<dynamic_cast<G4VEnergyLossProcess*>(pProcess)->IsIonisationProcess()<<G4endl;
+              //G4cout<<"INIT  "<<pProcess->GetProcessName()<<"  "<<dynamic_cast<G4VEnergyLossProcess*>(pProcess)->IsIonisationProcess()<< Gateendl;
               theListOfWrapper[particle]->RegisterProcess(pProcess);
               if(theListOfWrapperFactor[particle])	   theListOfWrapper[particle]->SetSplitFactor(theListOfWrapperFactor[particle]);
               if(theListOfWrapperCSEFactor[particle])	   theListOfWrapper[particle]->SetCSEFactor(theListOfWrapperCSEFactor[particle]);
@@ -210,16 +194,16 @@ void GateVProcess::PrintEnabledParticles(G4String name)
         {
           if(name=="All")
             {
-              if(k==0) std::cout<<"\n   ===  Process: "<<mG4ProcessName<<"  ==="<<std::endl;
-              std::cout<<"Particle: "<<theListOfEnabledParticles[k]->GetParticleName()<<std::endl;
+              if(k==0) std::cout<<"\n   ===  Process: "<<mG4ProcessName<<"  ===\n";
+              std::cout<<"Particle: "<<theListOfEnabledParticles[k]->GetParticleName()<< Gateendl;
             }
-          else std::cout<<"Process: "<<mG4ProcessName<<std::endl;
+          else std::cout<<"Process: "<<mG4ProcessName<< Gateendl;
 
           if(theListOfModels.size()!=0)
             {
-              std::cout<<"    * Model(s):"<<std::endl;
+              std::cout<<"    * Model(s):\n";
               if(theListOfParticlesWithSelectedModels.size()==0)
-                std::cout<<"       - <!> *** Warning *** <!> No model selected!"<<std::endl;
+                std::cout<<"       - <!> *** Warning *** <!> No model selected!\n";
               else
                 {
                   nSelectedModel = 0;
@@ -231,20 +215,20 @@ void GateVProcess::PrintEnabledParticles(G4String name)
                           nSelectedModel++;
                         }
                     }
-                  if(nSelectedModel==0)  std::cout<<"       - <!> *** Warning *** <!> No model selected!"<<std::endl;
+                  if(nSelectedModel==0)  std::cout<<"       - <!> *** Warning *** <!> No model selected!\n";
                 }
             }
           if(theListOfDataSets.size()!=0)
             {
-              std::cout<<"    * DataSet(s):"<<std::endl;
+              std::cout<<"    * DataSet(s):\n";
               if(theListOfParticlesWithSelectedDS.size()==0)
-                std::cout<<"       - Default"<<std::endl;
+                std::cout<<"       - Default\n";
 
               else
                 for(unsigned int i=0; i<theListOfParticlesWithSelectedDS.size(); i++)
                   {
                     if(theListOfEnabledParticles[k]->GetParticleName()==theListOfParticlesWithSelectedDS[i]->GetParticleName())
-         	      std::cout<<"        - "<<theListOfSelectedDataSets[i] <<std::endl;
+                      std::cout<<"        - "<<theListOfSelectedDataSets[i] << Gateendl;
                   }
             }
         }
@@ -283,7 +267,7 @@ void GateVProcess::PrintEnabledParticlesToFile(G4String file)
                     }
                 }
               os.open(file.data(), std::ios_base::app);
-              if(nSelectedModel==0)  os<<"       - <!> *** Warning *** <!> No model selected!"<<G4endl;
+              if(nSelectedModel==0)  os<<"       - <!> *** Warning *** <!> No model selected!\n";
             }
         }
       if(theListOfDataSets.size()!=0)
@@ -382,7 +366,7 @@ std::vector<G4ParticleDefinition*> GateVProcess::GetParticles(G4String param)
     {
       theListOfParticles = FindParticleName(param);
     }
-  if(theListOfParticles.size()==0) G4cout<< "\n  <!> *** Warning *** <!> Unknown particle: "<<param<<"\n"<<G4endl;
+  if(theListOfParticles.size()==0) G4cout<< "\n  <!> *** Warning *** <!> Unknown particle: "<<param<< Gateendl;
 
   G4ParticleDefinition* particle = 0;
   G4ParticleTable* theParticleTable = 0;
@@ -538,7 +522,7 @@ void GateVProcess::DataSetList(G4String par, G4int level, G4String symbol, G4Str
 
   if(theListOfDataSets.size()==0)
     {
-      G4cout<< "No DataSet for this process ("<<mG4ProcessName<<")\n"<<G4endl;
+      G4cout<< "No DataSet for this process ("<<mG4ProcessName<<")\n";
       return;
     }
 
@@ -548,11 +532,11 @@ void GateVProcess::DataSetList(G4String par, G4int level, G4String symbol, G4Str
   for(unsigned int i=0; i<theListOfParticles.size(); i++)
     {
       particle = theListOfParticles[i];
-      G4cout<<space<<"DataSet(s) for "<<particle->GetParticleName()<<" :"<<G4endl;
+      G4cout<<space<<"DataSet(s) for "<<particle->GetParticleName()<<" :\n";
 
       for(unsigned int j=0; j<theListOfDataSets.size(); j++)
         if( IsDatasetApplicable(theListOfDataSets[j],particle) )
-          G4cout<<space2<<theListOfDataSets[j]<<G4endl;
+          G4cout<<space2<<theListOfDataSets[j]<< Gateendl;
     }
 }
 //-----------------------------------------------------------------------------
@@ -648,7 +632,7 @@ void GateVProcess::ModelList(G4String par, G4int level, G4String symbol, G4Strin
 
   if(theListOfModels.size()==0)
     {
-      G4cout<< "No model for this process ("<<mG4ProcessName<<")\n"<<G4endl;
+      G4cout<< "No model for this process ("<<mG4ProcessName<<")\n";
       return;
     }
 
@@ -658,12 +642,12 @@ void GateVProcess::ModelList(G4String par, G4int level, G4String symbol, G4Strin
   for(unsigned int i=0; i<theListOfParticles.size(); i++)
     {
       particle = theListOfParticles[i];
-      //GateMessage("Physic",0,space<<"Model(s) for "<<particle->GetParticleName()<<" :"<<G4endl);
-      G4cout<<space<<"Model(s) for "<<particle->GetParticleName()<<" :"<<G4endl;
+      //GateMessage("Physic",0,space<<"Model(s) for "<<particle->GetParticleName()<<" :\n");
+      G4cout<<space<<"Model(s) for "<<particle->GetParticleName()<<" :\n";
 
       for(unsigned int j=0; j<theListOfModels.size(); j++)
         if( IsModelApplicable(theListOfModels[j],particle) )
-          G4cout<<space2<<theListOfModels[j]<<G4endl;
+          G4cout<<space2<<theListOfModels[j]<< Gateendl;
     }
 }
 //-----------------------------------------------------------------------------
@@ -1107,12 +1091,12 @@ void GateVProcess::AddModel(GateListOfHadronicModels *model)
       //G4BinaryCascade* g4model = new G4BinaryCascade ;
       if(model->IsEnergyRangeDefined()) SetEnergyRange(theListOfG4HadronicModels.back(),model);
       dynamic_cast<G4HadronicProcess*>(pProcess)->RegisterMe(theListOfG4HadronicModels.back());
-    }else if(model->GetModelName() == "GateBinaryCascade")
-    {
-      theListOfG4HadronicModels.push_back(new GateBinaryCascade);
-      if(model->IsEnergyRangeDefined()) SetEnergyRange(theListOfG4HadronicModels.back(),model);
-      dynamic_cast<G4HadronicProcess*>(pProcess)->RegisterMe(theListOfG4HadronicModels.back());
-    }
+    }// else if(model->GetModelName() == "GateBinaryCascade")
+  // {
+  //   theListOfG4HadronicModels.push_back(new GateBinaryCascade);
+  //   if(model->IsEnergyRangeDefined()) SetEnergyRange(theListOfG4HadronicModels.back(),model);
+  //   dynamic_cast<G4HadronicProcess*>(pProcess)->RegisterMe(theListOfG4HadronicModels.back());
+  // }
   else if(model->GetModelName() == "G4BertiniCascade")
     {
       theListOfG4HadronicModels.push_back(new G4CascadeInterface);
@@ -1294,8 +1278,8 @@ void GateVProcess::SetEnergyRange(G4HadronicInteraction * hadInteraction,GateLis
 
   if(nModel == 0)
   {
-  G4cout<< "\n  <!> *** Warning *** <!> This process "<<mG4ProcessName<<" is selected for "<<particle->GetParticleName()<<G4endl;
-  G4cout <<"                                          but it is not setted in his Process\n"<<G4endl;
+  G4cout<< "\n  <!> *** Warning *** <!> This process "<<mG4ProcessName<<" is selected for "<<particle->GetParticleName()<< Gateendl;
+  G4cout <<"                                          but it is not setted in his Process\n";
   return;
   }
 
@@ -1313,7 +1297,7 @@ void GateVProcess::SetEnergyRange(G4HadronicInteraction * hadInteraction,GateLis
 //-----------------------------------------------------------------------------
 G4bool GateVProcess::AddFilter(G4String filterType, G4String particle )
 {
-  GateDebugMessageInc("Physic",4,"AddFilter() -- begin"<<G4endl);
+  GateDebugMessageInc("Physic",4,"AddFilter() -- begin\n");
   if(GateActorManager::GetInstance()->theListOfFilterPrototypes[filterType])
     {
       for (std::map<G4String,GenericWrapperProcess*>::const_iterator iter = theListOfWrapper.begin(); iter!=theListOfWrapper.end();++iter)
@@ -1334,7 +1318,7 @@ G4bool GateVProcess::AddFilter(G4String filterType, G4String particle )
       return false;
     }
 
-  GateDebugMessageDec("Physic",4,"AddFilter() -- end"<<G4endl);
+  GateDebugMessageDec("Physic",4,"AddFilter() -- end\n");
   return true;
 }
 //-----------------------------------------------------------------------------

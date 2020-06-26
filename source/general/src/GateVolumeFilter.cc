@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -110,10 +110,10 @@ void GateVolumeFilter::Initialize()
 
 //---------------------------------------------------------------------------
 void GateVolumeFilter::show(){
-  G4cout << "------Filter: "<<GetObjectName()<<" ------"<<G4endl;
+  G4cout << "------Filter: "<<GetObjectName()<<" ------\n";
 
 
-  G4cout << "-------------------------------------------"<<G4endl;
+  G4cout << "-------------------------------------------\n";
 
 }
 //---------------------------------------------------------------------------

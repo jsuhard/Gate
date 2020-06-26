@@ -3,27 +3,22 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
 #ifndef GateSimplifiedDecayTransition_H
 #define GateSimplifiedDecayTransition_H 1
-#include "math.h"
-#include <limits>
-#include <cstdlib>
+#include <cmath>
 #include <iostream>
 #include <string>
-#include <vector>
+#include <utility>
 #include <functional>
-#include <algorithm>
-
 #include "Randomize.hh"
-
-using namespace std;
+#include <G4PhysicalConstants.hh>
 
 class GateSimplifiedDecay;
-typedef pair<string,double> psd;
+typedef std::pair<std::string,double> psd;
 
 
 class GateSimplifiedDecayTransition {
@@ -32,7 +27,7 @@ class GateSimplifiedDecayTransition {
 
  public:
 
-  GateSimplifiedDecayTransition(int cs, int ns, double pr,  mem_fun_t<psd,GateSimplifiedDecayTransition> act, double en=0, double ampl=0, double norm=0, int Z=0):
+  GateSimplifiedDecayTransition(int cs, int ns, double pr,  std::function<psd(GateSimplifiedDecayTransition*)> act, double en=0, double ampl=0, double norm=0, int Z=0):
     currentState(cs),
     nextState(ns),
     probability(pr),
@@ -58,7 +53,7 @@ class GateSimplifiedDecayTransition {
 
 
   void print(){
-    cout
+    std::cout
 	 << currentState << ", "
 	 <<  nextState << ", "
 	 <<  probability << ", "
@@ -66,11 +61,11 @@ class GateSimplifiedDecayTransition {
 	 <<  amplitude << ", "
 	 <<  normalisationFactor << ", "
 	 <<  atomicNumber
-	 <<  endl;
+	 <<  std::endl;
   }
 
   GateSimplifiedDecayTransition* sample(int n){
-    for (int i=0; i<n; i++) cout << majoredHitAndMiss() << endl;
+    for (int i=0; i<n; i++) std::cout << majoredHitAndMiss() << std::endl;
     return this;
   }
 
@@ -82,13 +77,13 @@ class GateSimplifiedDecayTransition {
   double majoredHitAndMiss();
 
   inline double majoringFunction(double x){
-    return amplitude*sin(Pi*x/energy);
+    return amplitude*sin(pi*x/energy);
   }
   inline double majoringInverseCDF(double x){
-    return energy/Pi*acos(- Pi*x/(energy * amplitude));
+    return energy/pi*acos(-pi*x/(energy * amplitude));
   }
   inline double CDFRandom(){
-    return majoringInverseCDF( energy * amplitude/Pi * (2*G4UniformRand()-1) );
+    return majoringInverseCDF( energy * amplitude/pi * (2*G4UniformRand()-1) );
   }
 
  private:
@@ -96,16 +91,13 @@ class GateSimplifiedDecayTransition {
   int    currentState;
   int    nextState;
   double probability;
-  mem_fun_t<psd,GateSimplifiedDecayTransition> action;
+  std::function<psd(GateSimplifiedDecayTransition*)> action;
   double energy;                                    //  Maximum energy (inMeV)
   double amplitude;                                 //  Majoring function amplitude (for positrons)
   double normalisationFactor;                       //  normalisation factor for PDF (for positrons)
   int    atomicNumber;
 
-  static  double kAlpha;
   static  double kAlphaSquared;
-  static  double Pi;
-  static  double E;
 
 };
 

@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #include "GateCrystalSD.hh"
@@ -57,7 +57,7 @@ GateCrystalSD::~GateCrystalSD()
 void GateCrystalSD::Initialize(G4HCofThisEvent*HCE)
 {
   static int HCID = -1; // Static variable storing the hit collection ID
-
+// Not thread safe but moving to local variable doesn't work
   // Creation of a new hit collection
   crystalCollection = new GateCrystalHitsCollection
                    (SensitiveDetectorName,theCrystalCollectionName);
@@ -83,6 +83,9 @@ G4bool GateCrystalSD::ProcessHits(G4Step*aStep, G4TouchableHistory*)
   G4Track* aTrack       = aStep->GetTrack();
   G4int    trackID      = aTrack->GetTrackID();
   G4int    parentID     = aTrack->GetParentID();
+  // Seb Modif 5/4/2016
+  G4double trackLength  = aTrack->GetTrackLength();
+  G4double trackLocalTime = aTrack->GetLocalTime();
 
   G4String partName     = aTrack->GetDefinition()->GetParticleName();
   G4int    PDGEncoding  = aTrack->GetDefinition()->GetPDGEncoding();
@@ -94,7 +97,7 @@ G4bool GateCrystalSD::ProcessHits(G4Step*aStep, G4TouchableHistory*)
 
   //  Get the process name
   const G4VProcess* process = newStepPoint->GetProcessDefinedStep();
- G4String processName = ( (process != NULL) ? process->GetProcessName() : G4String() ) ;
+  G4String processName = ( (process != NULL) ? process->GetProcessName() : G4String() ) ;
 
   //  For all processes except transportation, we select the PostStepPoint volume
   //  For the transportation, we select the PreStepPoint volume
@@ -115,6 +118,9 @@ G4bool GateCrystalSD::ProcessHits(G4Step*aStep, G4TouchableHistory*)
   //Modifs Seb 22-06-2011
   //G4ThreeVector position = oldStepPoint->GetPosition();
   G4ThreeVector position = newStepPoint->GetPosition();
+  
+  // Get the hit momentumDirecton
+  G4ThreeVector momentumDirection = newStepPoint->GetMomentumDirection();
 
   // Compute the hit local position
   // (It will be in the reference frame of the PreStepPoint volume for a transportation hit)
@@ -158,6 +164,10 @@ G4bool GateCrystalSD::ProcessHits(G4Step*aStep, G4TouchableHistory*)
   aHit->SetLocalPos( localPosition );
   aHit->SetProcess( processName );
   aHit->SetTrackID( trackID );
+ // Seb Modif 5/4/2016 
+  aHit->SetTrackLength( trackLength );
+  aHit->SetTrackLocalTime( trackLocalTime );
+  aHit->SetMomentumDir( momentumDirection );
   aHit->SetParentID( parentID );
   aHit->SetVolumeID( volumeID );
   aHit->SetScannerPos( scannerPos );
@@ -186,10 +196,10 @@ G4int GateCrystalSD::PrepareCreatorAttachment(GateVVolume* aCreator)
 
    GateVSystem* creatorSystem = GateSystemListManager::GetInstance()->FindSystemOfCreator(aCreator->GetCreator());
    if (!creatorSystem) {
-      G4cout  << G4endl << G4endl << "[GateCrystalSD::PrepareCreatorAttachment]:" << G4endl
-            << "Volume '" << aCreator->GetObjectName() << "' does not belong to any system." << G4endl
-            << "Your volume must belong to a system to be used with a crystalSD." << G4endl
-            << "Attachment request ignored --> you won't have any hit output from this volume!!!" << G4endl << G4endl;
+      G4cout  << Gateendl << Gateendl << "[GateCrystalSD::PrepareCreatorAttachment]:\n"
+            << "Volume '" << aCreator->GetObjectName() << "' does not belong to any system.\n"
+            << "Your volume must belong to a system to be used with a crystalSD.\n"
+            << "Attachment request ignored --> you won't have any hit output from this volume!!!\n" << Gateendl;
       return -1;
    }
 
@@ -252,12 +262,13 @@ GateVSystem* GateCrystalSD::FindSystem(GateVolumeID volumeID)
 //------------------------------------------------------------------------------
 GateVSystem* GateCrystalSD::FindSystem(G4String& systemName)
 {
-   G4int index = -1;
-   for(size_t i=0; i<m_systemList->size(); i++)
+   for(GateSystemIterator itr=m_systemList->begin(); itr!=m_systemList->end(); itr++)
    {
-      if(systemName.compare(m_systemList->at(i)->GetOwnName()) == 0)
-         index = i;
+      if(systemName.compare((*itr)->GetOwnName()) == 0)
+      {
+         return *itr;
+      }
    }
 
-   return m_systemList->at(index);
+   return m_systemList->at(-1);
 }

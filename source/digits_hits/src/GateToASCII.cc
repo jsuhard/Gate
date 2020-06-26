@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #include "GateToASCII.hh"
@@ -14,7 +14,6 @@
 #include "GateVGeometryVoxelStore.hh"
 #include "GateCrystalHit.hh"
 #include "GatePhantomHit.hh"
-#include "GateRecorderBase.hh"
 #include "GatePrimaryGeneratorAction.hh"
 #include "GateVVolume.hh"
 #include "GateDigitizer.hh"
@@ -33,7 +32,6 @@
 #include "G4VProcess.hh"
 #include "G4ios.hh"
 #include "G4UImanager.hh"
-#include "G4RunManager.hh"
 #include "G4ParticleDefinition.hh"
 #include "G4Positron.hh"
 #include "G4GenericIon.hh"
@@ -55,10 +53,10 @@ GateToASCII::GateToASCII(const G4String& name, GateOutputMgr* outputMgr, DigiMod
                    // They are then checked in GateApplicationMgr::StartDAQ, using
                    // the VOutputModule pure virtual method GiveNameOfFile()
 {
-/*
-  if (digiMode==kofflineMode)
+  /*
+    if (digiMode==kofflineMode)
     m_fileName=" ";
-*/
+  */
 
   m_isEnabled = false; // Keep this flag false: all output are disabled by default
   nVerboseLevel =0;
@@ -75,12 +73,12 @@ GateToASCII::GateToASCII(const G4String& name, GateOutputMgr* outputMgr, DigiMod
 
 GateToASCII::~GateToASCII()
 {
-  for (size_t i=0; i<m_outputChannelList.size() ; ++i )
-    delete m_outputChannelList[i];
+  // for (size_t i=0; i<m_outputChannelList.size() ; ++i )
+  //   delete m_outputChannelList[i];
 
   delete m_asciiMessenger;
 
-  if (nVerboseLevel > 0) G4cout << "GateToASCII deleting..." << G4endl;
+  if (nVerboseLevel > 0) G4cout << "GateToASCII deleting...\n";
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -95,7 +93,7 @@ const G4String& GateToASCII::GiveNameOfFile()
 void GateToASCII::RecordBeginOfAcquisition()
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::RecordBeginOfAcquisition" << G4endl;
+    G4cout << "GateToASCII::RecordBeginOfAcquisition\n";
 
   if (nVerboseLevel > 0) G4cout << "Opening the ASCII output files...";
   if (m_outFileRunsFlag)
@@ -106,7 +104,7 @@ void GateToASCII::RecordBeginOfAcquisition()
   for (size_t i=0; i<m_outputChannelList.size() ; ++i )
     m_outputChannelList[i]->Open(m_fileName);
 
-  if (nVerboseLevel > 0) G4cout << " ... ASCII output files opened" << G4endl;
+  if (nVerboseLevel > 0) G4cout << " ... ASCII output files opened\n";
 }
 
 
@@ -118,7 +116,7 @@ void GateToASCII::RecordBeginOfAcquisition()
 void GateToASCII::RecordEndOfAcquisition()
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::RecordEndOfAcquisition" << G4endl;
+    G4cout << "GateToASCII::RecordEndOfAcquisition\n";
   // Close the file with the hits information
   if (m_outFileRunsFlag)
     m_outFileRun.close();
@@ -126,7 +124,7 @@ void GateToASCII::RecordEndOfAcquisition()
     m_outFileHits.close();
 
   for (size_t i=0; i<m_outputChannelList.size() ; ++i )
-       m_outputChannelList[i]->Close();
+    m_outputChannelList[i]->Close();
 
 }
 
@@ -137,7 +135,7 @@ void GateToASCII::RecordEndOfAcquisition()
 void GateToASCII::RecordBeginOfRun(const G4Run * )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::RecordBeginOfRun" << G4endl;
+    G4cout << "GateToASCII::RecordBeginOfRun\n";
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -145,15 +143,15 @@ void GateToASCII::RecordBeginOfRun(const G4Run * )
 void GateToASCII::RecordEndOfRun(const G4Run * )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::RecordEndOfRun" << G4endl;
+    G4cout << "GateToASCII::RecordEndOfRun\n";
   if (m_outFileRunsFlag) {
-    G4int nEvent = ((GatePrimaryGeneratorAction*)G4RunManager::GetRunManager()->
+    G4int nEvent = ((GatePrimaryGeneratorAction*)GateRunManager::GetRunManager()->
 		    GetUserPrimaryGeneratorAction())->GetEventNumber();
     if (nVerboseLevel > 0) G4cout
-      << "GateToASCII::RecordEndOfRun: Events in the past run: " << nEvent << G4endl;
+                             << "GateToASCII::RecordEndOfRun: Events in the past run: " << nEvent << Gateendl;
     m_outFileRun
       << " " << std::setw(9) << nEvent
-      << G4endl;
+      << Gateendl;
   }
 
 }
@@ -163,7 +161,7 @@ void GateToASCII::RecordEndOfRun(const G4Run * )
 void GateToASCII::RecordBeginOfEvent(const G4Event* )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::RecordBeginOfEvent" << G4endl;
+    G4cout << "GateToASCII::RecordBeginOfEvent\n";
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -171,7 +169,7 @@ void GateToASCII::RecordBeginOfEvent(const G4Event* )
 void GateToASCII::RecordEndOfEvent(const G4Event* event)
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::RecordEndOfEvent" << G4endl;
+    G4cout << "GateToASCII::RecordEndOfEvent\n";
 
   if (m_outFileHitsFlag) {
 
@@ -188,8 +186,8 @@ void GateToASCII::RecordEndOfEvent(const G4Event* event)
 	G4String processName = (*CHC)[iHit]->GetProcess();
 	G4int PDGEncoding  = (*CHC)[iHit]->GetPDGEncoding();
 	if (nVerboseLevel > 2) G4cout
-	  << "GateToASCII::RecordEndOfEvent : CrystalHitsCollection: processName : <" << processName
-	  << ">    Particls PDG code : " << PDGEncoding << G4endl;
+                                 << "GateToASCII::RecordEndOfEvent : CrystalHitsCollection: processName : <" << processName
+                                 << ">    Particls PDG code : " << PDGEncoding << Gateendl;
 	if ((*CHC)[iHit]->GoodForAnalysis()) {
 	  if (m_outFileHitsFlag) m_outFileHits << (*CHC)[iHit];
 	}
@@ -197,7 +195,7 @@ void GateToASCII::RecordEndOfEvent(const G4Event* event)
 
     }
     else{
-      if (nVerboseLevel>0) G4cout << "GateToASCII::RecordHits : GateCrystalHitCollection not found" << G4endl;
+      if (nVerboseLevel>0) G4cout << "GateToASCII::RecordHits : GateCrystalHitCollection not found\n";
     }
   }
 
@@ -210,7 +208,7 @@ void GateToASCII::RecordEndOfEvent(const G4Event* event)
 void GateToASCII::RecordDigitizer(const G4Event* )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::RecordDigitizer" << G4endl;
+    G4cout << "GateToASCII::RecordDigitizer\n";
 
   for (size_t i=0; i<m_outputChannelList.size() ; ++i )
     m_outputChannelList[i]->RecordDigitizer();
@@ -221,7 +219,7 @@ void GateToASCII::RecordDigitizer(const G4Event* )
 void GateToASCII::RecordStepWithVolume(const GateVVolume * /*v //WARNING: parameter not used*/, const G4Step* )
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::RecordStep" << G4endl;
+    G4cout << "GateToASCII::RecordStep\n";
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo....
@@ -229,52 +227,52 @@ void GateToASCII::RecordStepWithVolume(const GateVVolume * /*v //WARNING: parame
 void GateToASCII::RecordVoxels(GateVGeometryVoxelStore* voxelStore)
 {
   if (nVerboseLevel > 2)
-    G4cout << "[GateToASCII::RecordVoxels]" << G4endl;
+    G4cout << "[GateToASCII::RecordVoxels]\n";
   if (m_recordFlag>0)
-  {
-    // protect against huge ASCII files in case of nx,ny,nz ~O(100)
-    if (!m_outFileVoxelFlag) return;
+    {
+      // protect against huge ASCII files in case of nx,ny,nz ~O(100)
+      if (!m_outFileVoxelFlag) return;
 
-    std::ofstream  voxelFile; 	      	    //!< Output stream for the voxel density map
-    // Open the header file
-    G4String voxelFileName = "voxels.dat";
-    voxelFile.open(voxelFileName.c_str(),std::ios::out | std::ios::trunc);
-    if (!(voxelFile.is_open()))
-		{
-			G4String msg = "Could not open the voxel file '" + voxelFileName;
-        	G4Exception( "GateToASCII::RecordVoxels", "RecordVoxels", FatalException, msg);
-		}
-
-    // Write the header: number of voxels, voxel dimensions
-    G4int nx = voxelStore->GetVoxelNx();
-    G4int ny = voxelStore->GetVoxelNy();
-    G4int nz = voxelStore->GetVoxelNz();
-    G4ThreeVector voxelSize = voxelStore->GetVoxelSize();
-    G4double dx = voxelSize.x();
-    G4double dy = voxelSize.y();
-    G4double dz = voxelSize.z();
-
-    voxelFile << " " << nx << " " << ny << " " << nz << G4endl;
-    voxelFile << std::resetiosflags(std::ios::floatfield) << std::setiosflags(std::ios::scientific) << std::setw(10) << std::setprecision(3)  << dx/mm;
-    voxelFile << std::resetiosflags(std::ios::floatfield) << std::setiosflags(std::ios::scientific) << std::setw(10) << std::setprecision(3)  << dy/mm;
-    voxelFile << std::resetiosflags(std::ios::floatfield) << std::setiosflags(std::ios::scientific) << std::setw(10) << std::setprecision(3)  << dz/mm;
-    voxelFile << G4endl;
-
-    // Write the content of the voxel matrix
-    for (G4int iz=0; iz<nz; iz++) {
-      for (G4int iy=0; iy<ny; iy++) {
-        for (G4int ix=0; ix<nx; ix++) {
-	  G4double density = voxelStore->GetVoxelMaterial(ix,iy,iz)->GetDensity()/(gram/cm3);
-	  //	G4cout << "Material: " << voxelStore->GetVoxelMaterial(ix,iy,iz)->GetName() << "  density: " << density << G4endl;
-	  voxelFile << std::resetiosflags(std::ios::floatfield) << std::setiosflags(std::ios::scientific) << std::setw(10) << std::setprecision(3)  << density;
+      std::ofstream  voxelFile; 	      	    //!< Output stream for the voxel density map
+      // Open the header file
+      G4String voxelFileName = "voxels.dat";
+      voxelFile.open(voxelFileName.c_str(),std::ios::out | std::ios::trunc);
+      if (!(voxelFile.is_open()))
+        {
+          G4String msg = "Could not open the voxel file '" + voxelFileName;
+          G4Exception( "GateToASCII::RecordVoxels", "RecordVoxels", FatalException, msg);
         }
-        // line break for each voxel line
-        voxelFile << G4endl;
-      }
-    }
 
-    voxelFile.close();
-  }
+      // Write the header: number of voxels, voxel dimensions
+      G4int nx = voxelStore->GetVoxelNx();
+      G4int ny = voxelStore->GetVoxelNy();
+      G4int nz = voxelStore->GetVoxelNz();
+      G4ThreeVector voxelSize = voxelStore->GetVoxelSize();
+      G4double dx = voxelSize.x();
+      G4double dy = voxelSize.y();
+      G4double dz = voxelSize.z();
+
+      voxelFile << " " << nx << " " << ny << " " << nz << Gateendl;
+      voxelFile << std::resetiosflags(std::ios::floatfield) << std::setiosflags(std::ios::scientific) << std::setw(10) << std::setprecision(3)  << dx/mm;
+      voxelFile << std::resetiosflags(std::ios::floatfield) << std::setiosflags(std::ios::scientific) << std::setw(10) << std::setprecision(3)  << dy/mm;
+      voxelFile << std::resetiosflags(std::ios::floatfield) << std::setiosflags(std::ios::scientific) << std::setw(10) << std::setprecision(3)  << dz/mm;
+      voxelFile << Gateendl;
+
+      // Write the content of the voxel matrix
+      for (G4int iz=0; iz<nz; iz++) {
+        for (G4int iy=0; iy<ny; iy++) {
+          for (G4int ix=0; ix<nx; ix++) {
+            G4double density = voxelStore->GetVoxelMaterial(ix,iy,iz)->GetDensity()/(gram/cm3);
+            //	G4cout << "Material: " << voxelStore->GetVoxelMaterial(ix,iy,iz)->GetName() << "  density: " << density << Gateendl;
+            voxelFile << std::resetiosflags(std::ios::floatfield) << std::setiosflags(std::ios::scientific) << std::setw(10) << std::setprecision(3)  << density;
+          }
+          // line break for each voxel line
+          voxelFile << Gateendl;
+        }
+      }
+
+      voxelFile.close();
+    }
 
 }
 
@@ -283,7 +281,7 @@ void GateToASCII::RecordVoxels(GateVGeometryVoxelStore* voxelStore)
 void GateToASCII::Reset()
 {
   if (nVerboseLevel > 2)
-    G4cout << "GateToASCII::Reset" << G4endl;
+    G4cout << "GateToASCII::Reset\n";
 }
 
 
@@ -295,7 +293,7 @@ void GateToASCII::RegisterNewSingleDigiCollection(const G4String& aCollectionNam
     new SingleOutputChannel(aCollectionName,outputFlag);
   m_outputChannelList.push_back(singleOutputChannel);
 
-//  G4cout << " GateToASCII::RegisterNewSingleDigiCollection " << G4endl;
+  //  G4cout << " GateToASCII::RegisterNewSingleDigiCollection \n";
   m_asciiMessenger->CreateNewOutputChannelCommand(singleOutputChannel);
 }
 
@@ -307,7 +305,7 @@ void GateToASCII::RegisterNewCoincidenceDigiCollection(const G4String& aCollecti
     new CoincidenceOutputChannel(aCollectionName,outputFlag);
   m_outputChannelList.push_back(coincOutputChannel);
 
-//  G4cout << " GateToASCII::RegisterNewCoincidenceDigiCollection " << G4endl;
+  //  G4cout << " GateToASCII::RegisterNewCoincidenceDigiCollection \n";
   m_asciiMessenger->CreateNewOutputChannelCommand(coincOutputChannel);
 }
 
@@ -333,10 +331,10 @@ void GateToASCII::VOutputChannel::Open(const G4String& aFileBaseName)
   G4String fileName = aFileBaseName + m_collectionName + fileCounterSuffix + ".dat";
   if (m_outputFlag) {
     m_outputFile.open(fileName,std::ios::out);
-	//LF
+    //LF
     //m_outputFile.seekp (0, ios::beg);
-	 m_outputFile.seekp (0, std::ios::beg);
-	//LF
+    m_outputFile.seekp (0, std::ios::beg);
+    //LF
     m_outputFileBegin = m_outputFile.tellp();
   }
   m_fileBaseName = aFileBaseName;
@@ -360,10 +358,10 @@ G4bool GateToASCII::VOutputChannel::ExceedsSize()
   //LF
   outputFileEnd = m_outputFile.tellp();
   long size = outputFileEnd - m_outputFileBegin; // in bytes
-//   G4cout << "[GateToASCII::VOutputChannel::ExceedsSize]"
-// 	 << " collectionID: " << m_collectionID
-// 	 << " file limit: " << m_outputFileSizeLimit
-// 	 << " file size: " << size << G4endl;
+  //   G4cout << "[GateToASCII::VOutputChannel::ExceedsSize]"
+  // 	 << " collectionID: " << m_collectionID
+  // 	 << " file limit: " << m_outputFileSizeLimit
+  // 	 << " file size: " << size << Gateendl;
   return (size > m_outputFileSizeLimit);
 }
 
@@ -385,11 +383,11 @@ void GateToASCII::SingleOutputChannel::RecordDigitizer()
 
   if (!SDC) {
     if (nVerboseLevel>0) G4cout << "[GateToASCII::SingleOutputChannel::RecordDigitizer]: "
-    				 << "digi collection '" << m_collectionName <<"' not found" << G4endl;
+                                << "digi collection '" << m_collectionName <<"' not found\n";
   } else {
     // Digi loop
     if (nVerboseLevel>0) G4cout << "[GateToASCII::SingleOutputChannel::RecordDigitizer]: Totals digits: "
-				 << SDC->entries() << G4endl;
+                                << SDC->entries() << Gateendl;
     if (m_outputFlag) {
       G4int n_digi =  SDC->entries();
       for (G4int iDigi=0;iDigi<n_digi;iDigi++) {
@@ -424,11 +422,11 @@ void GateToASCII::CoincidenceOutputChannel::RecordDigitizer()
 
   if (!CDC) {
     if (nVerboseLevel>0) G4cout << "[GateToASCII::CoincidenceOutputChannel::RecordDigitizer]: "
-    				 << "digi collection '" << m_collectionName <<"' not found" << G4endl;
+                                << "digi collection '" << m_collectionName <<"' not found\n";
   } else {
     // Digi loop
     if (nVerboseLevel>0) G4cout << "[GateToASCII::CoincidenceOutputChannel::RecordDigitizer]: Totals digits: "
-				 << CDC->entries() << G4endl;
+                                << CDC->entries() << Gateendl;
 
     if (m_outputFlag) {
       G4int n_digi =  CDC->entries();

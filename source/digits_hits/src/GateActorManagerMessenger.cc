@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -22,7 +22,7 @@ GateActorManagerMessenger::GateActorManagerMessenger(GateActorManager* sMan)
 
   : pActorManager(sMan)
 {
-  //  G4cout << " Constructeur GateActorManagerMessenger " << G4endl;
+  //  G4cout << " Constructeur GateActorManagerMessenger \n";
   BuildCommands("/gate/actor");
 }
 //-----------------------------------------------------------------------------
@@ -42,7 +42,7 @@ GateActorManagerMessenger::~GateActorManagerMessenger()
 //-----------------------------------------------------------------------------
 void GateActorManagerMessenger::BuildCommands(G4String base)
 {
-  //  G4cout << " GateActorManagerMessenger::BuildCommands " << G4endl;
+  //  G4cout << " GateActorManagerMessenger::BuildCommands \n";
 
   pActorCommand = new G4UIdirectory("/gate/actor/");
   pActorCommand->SetGuidance("GATE actors control.");
@@ -51,7 +51,7 @@ void GateActorManagerMessenger::BuildCommands(G4String base)
   G4String bb;
   bb = base+"/addActor";
 
-  //  G4cout << " base addActor " << bb << G4endl;
+  //  G4cout << " base addActor " << bb << Gateendl;
   pAddActor = new GateUIcmdWith2String(bb,this);
   guidance = "Add a new sensor";
   pAddActor->SetGuidance(guidance);

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -94,5 +94,5 @@ void GateCalibration::FindInputPulseParams(const GateVolumeID* aVolumeID)
 
 void GateCalibration::DescribeMyself(size_t indent)
 {
-  G4cout << GateTools::Indent(indent) << "Calibration Nphotoelectrons->Energy " << G4endl;
+  G4cout << GateTools::Indent(indent) << "Calibration Nphotoelectrons->Energy \n";
 }

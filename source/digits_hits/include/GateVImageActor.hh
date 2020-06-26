@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 /*!
@@ -29,7 +29,7 @@ class GateVImageActor: public GateVActor
 {
 public :
   //-----------------------------------------------------------------------------
-  enum StepHitType {PreStepHitType, PostStepHitType, MiddleStepHitType, RandomStepHitType};
+  enum StepHitType {PreStepHitType, PostStepHitType, MiddleStepHitType, RandomStepHitType, RandomStepHitTypeCylindricalCS, PostStepHitTypeCylindricalCS};
 
   //-----------------------------------------------------------------------------
   /// Constructs the class
@@ -46,7 +46,7 @@ public :
   // When a image is managed by the actor, you must initialize the
   // coordinate system with this function
   void SetOriginTransformAndFlagToImage(GateImageWithStatistic & image);
-  void SetOriginTransformAndFlagToImage(GateImage & image);
+  void SetOriginTransformAndFlagToImage(GateVImage & image);
   //-----------------------------------------------------------------------------
 
   //-----------------------------------------------------------------------------
@@ -62,6 +62,9 @@ public :
   //-----------------------------------------------------------------------------
 
   double GetDoselVolume(){return mVoxelSize.x()*mVoxelSize.y()*mVoxelSize.z();}
+
+  // Retreive the image voxel size (vc)
+  G4ThreeVector GetVoxelSize();
 
   //-----------------------------------------------------------------------------
   /// Computes the voxel in which to store the data and invokes
@@ -79,6 +82,13 @@ public :
   //-----------------------------------------------------------------------------
 
   virtual void ResetData();
+
+  static int GetIndexFromStepPosition2(const GateVVolume *,
+                                       const G4Step  * step,
+                                       const GateImage & image,
+                                       const bool mPositionIsSet,
+                                       const G4ThreeVector mPosition,
+                                       const StepHitType mStepHitType);
 
 protected:
 

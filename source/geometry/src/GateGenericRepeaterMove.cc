@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -92,7 +92,7 @@ void GateGenericRepeaterMove::PushMyPlacements(const G4RotationMatrix& currentRo
     GateError("Please provide a time-placement-repeat file with 'setPlacementsFilename'\n.");
   }
   
-  //  GateMessage("Core", 0, "GateGenericRepeaterMove::PushMyPlacements " << GetObjectName() << " t=" << aTime/s << " sec." << G4endl);
+  //  GateMessage("Core", 0, "GateGenericRepeaterMove::PushMyPlacements " << GetObjectName() << " t=" << aTime/s << " sec.\n");
   std::vector<GatePlacement> list;
   GetPlacementListFromTime(aTime, list);
   mGenericRepeater->SetPlacementList(list);
@@ -112,7 +112,7 @@ void GateGenericRepeaterMove::GetPlacementListFromTime(double aTime,
   i--;
   if ((i < 0) && (aTime < mTimeList[0])) {
     GateError("The time list for " << GetObjectName() << " begin with " << mTimeList[0]/s
-              << " sec, so I cannot find the time" << aTime/s << " sec." << G4endl);
+              << " sec, so I cannot find the time" << aTime/s << " sec.\n");
   }
   list = mListOfPlacementsList[i];
 }

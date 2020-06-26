@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -52,7 +52,7 @@ G4VProcess* GateIonInelasticPB::CreateProcess(G4ParticleDefinition * par)
   else {
     GateError("Error in GateIonInelasticPB::CreateProcess particle should be GenericIon/Triton/Alpha/Deuteron " 
 	      << "\n while it is " << par->GetParticleName() 
-	      << G4endl);
+	      << Gateendl);
     return NULL;
   }
 }

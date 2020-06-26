@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -14,7 +14,6 @@ See GATE/LICENSE.txt for further details
 #include "GateVolumeManager.hh"
 
 #include "G4Trap.hh"
-#include "G4RunManager.hh"
 #include "G4VVisManager.hh"
 
 #include "globals.hh"

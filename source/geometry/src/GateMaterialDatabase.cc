@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #include "G4SystemOfUnits.hh"
@@ -41,15 +41,32 @@ GateMaterialDatabase::~GateMaterialDatabase()
 void GateMaterialDatabase::AddMDBFile(const G4String& filename)
 {
   mMDBFile.push_back(new GateMDBFile(this,filename));
-  GateMessage("Materials",1, "New material database added - Number of files: "<<mMDBFile.size() << G4endl);	  
+  GateMessage("Materials",1, "New material database added - Number of files: "<<mMDBFile.size() << Gateendl);	  
 }
 //-----------------------------------------------------------------------------
 
 
 //-----------------------------------------------------------------------------
+G4Isotope* GateMaterialDatabase::GetIsotope(const G4String& isotopeName)
+{
+  GateMessage("Materials",5,"GateMaterialDatabase::GetIsotope("<<isotopeName<<")\n");
+  G4Isotope* isotope = LookForIsotopeInTable(isotopeName);
+
+  if (!isotope) {
+    isotope = ReadIsotopeFromDBFile(isotopeName);
+    if (!isotope)
+      GateError("GateMaterialDatabase: failed to read the isotope '" << isotopeName << "' in the database file!");
+  }
+  return isotope;
+}
+//-----------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------
 G4Element* GateMaterialDatabase::GetElement(const G4String& elementName)
 {
-  GateMessage("Materials",5,"GateMaterialDatabase::GetElement("<<elementName<<")"<<G4endl);
+  GateMessage("Materials",5,"GateMaterialDatabase::GetElement("<<elementName<<")\n");
   G4Element* element = LookForElementInTable(elementName);
 
   if (!element) {
@@ -66,7 +83,7 @@ G4Element* GateMaterialDatabase::GetElement(const G4String& elementName)
 //-----------------------------------------------------------------------------
 G4Material* GateMaterialDatabase::GetMaterial(const G4String& materialName)
 {
-  GateMessage("Materials",3,"GateMaterialDatabase::GetMaterial("<<materialName<<")"<<G4endl);
+  GateMessage("Materials",3,"GateMaterialDatabase::GetMaterial("<<materialName<<")\n");
   
   G4Material* material = LookForMaterialInTable(materialName);
   
@@ -81,9 +98,35 @@ G4Material* GateMaterialDatabase::GetMaterial(const G4String& materialName)
 
 
 //-----------------------------------------------------------------------------
+G4Isotope* GateMaterialDatabase::ReadIsotopeFromDBFile(const G4String& isotopeName)
+{
+  GateMessage("Materials",5,"GateMaterialDatabase::ReadIsotopeFromDBFile("<<isotopeName<<")\n");
+  GateIsotopeCreator *CreatorTemp = 0;
+  GateIsotopeCreator *Creator = 0;
+  int nDef=0;
+  G4String fileName= "";
+
+  std::vector<GateMDBFile*>::iterator i;
+  for (i=mMDBFile.begin();i!=mMDBFile.end();++i) {
+    CreatorTemp = (*i)->ReadIsotope(isotopeName);
+    if (CreatorTemp) {Creator = CreatorTemp; nDef++;fileName=(*i)->GetMDBFileName();}
+    //if (Creator) break;
+  }
+
+
+  if (!Creator) GateError("GateMaterialDatabase: could not find the definition for isotope '" <<isotopeName << "' in material files");
+  if(nDef>1) GateWarning("GateMaterialDatabase: Multiple definition of isotope: "<<isotopeName<<".\nThe definition in "<<fileName<<" was used.\n");
+  G4Isotope* isotope =  Creator->Construct();
+  delete Creator;
+  return isotope;
+}
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
 G4Element* GateMaterialDatabase::ReadElementFromDBFile(const G4String& elementName)
 {
-  GateMessage("Materials",5,"GateMaterialDatabase::ReadElementFromDBFile("<<elementName<<")"<<G4endl);
+  GateMessage("Materials",5,"GateMaterialDatabase::ReadElementFromDBFile("<<elementName<<")\n");
   GateElementCreator *CreatorTemp = 0;
   GateElementCreator *Creator = 0;
   int nDef=0;
@@ -108,7 +151,7 @@ G4Element* GateMaterialDatabase::ReadElementFromDBFile(const G4String& elementNa
 //-----------------------------------------------------------------------------
 G4Material* GateMaterialDatabase::ReadMaterialFromDBFile(const G4String& materialName)
 {
-  GateMessage("Materials",3,"GateMaterialDatabase::ReadMaterialFromDBFile("<<materialName<<")"<<G4endl);
+  GateMessage("Materials",3,"GateMaterialDatabase::ReadMaterialFromDBFile("<<materialName<<")\n");
     
   GateMaterialCreator *Creator = 0;
   GateMaterialCreator *CreatorTemp = 0;

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -35,7 +35,7 @@ GateGeometryVoxelTabulatedTranslatorMessenger::GateGeometryVoxelTabulatedTransla
   G4String cmdName;
 
   cmdName = GetDirectoryName()+"readTable";
-  G4cout << " cmdName readTable = " << cmdName << G4endl;
+  G4cout << " cmdName readTable = " << cmdName << Gateendl;
   ReadTableCmd = new G4UIcmdWithAString(cmdName,this);
   ReadTableCmd->SetGuidance("Reads the translation table from a file");
   ReadTableCmd->SetGuidance("1. file name");
@@ -62,7 +62,7 @@ GateGeometryVoxelTabulatedTranslatorMessenger::~GateGeometryVoxelTabulatedTransl
 void GateGeometryVoxelTabulatedTranslatorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 { 
   if( command == ReadTableCmd ) {
-    G4cout << " Call ReadTableCmd command" << G4endl;
+    G4cout << " Call ReadTableCmd command\n";
     m_voxelTranslator->ReadTranslationTable(newValue);
   } else if ( command == DescribeCmd ) {
     m_voxelTranslator->Describe(DescribeCmd->GetNewIntValue(newValue));

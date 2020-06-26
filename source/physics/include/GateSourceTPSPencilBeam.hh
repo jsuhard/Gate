@@ -3,38 +3,29 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 #ifndef GATESOURCETPSPENCILBEAM_HH
 #define GATESOURCETPSPENCILBEAM_HH
 
-#include "GateConfiguration.h"
-
-#ifdef G4ANALYSIS_USE_ROOT
-#include "G4Event.hh"
-#include "globals.hh"
-#include "G4VPrimaryGenerator.hh"
-#include "G4ThreeVector.hh"
-#include "G4ParticleDefinition.hh"
-#include "G4ParticleTable.hh"
-#include "G4PrimaryVertex.hh"
-#include "G4ParticleMomentum.hh"
+// std
 #include <iomanip>
 #include <vector>
 
-#include "GateVSource.hh"
-#include "GateSourceTPSPencilBeamMessenger.hh"
-#include "GateSourcePencilBeam.hh"
+// geant4
+#include "G4String.hh"
+#include "G4ThreeVector.hh"
 
-#include "CLHEP/Random/RandGeneral.h"
-#include "CLHEP/RandomObjects/RandMultiGauss.h"
+// CLHEP
 #include "CLHEP/Random/RandGauss.h"
-#include "CLHEP/Matrix/Vector.h"
-#include "CLHEP/Matrix/SymMatrix.h"
-#include "GateRandomEngine.hh"
-#include "TMath.h"
 
-void ReadLineTo3Doubles(double *toto, char *oneline);
+// GATE
+#include "GateConfiguration.h"
+#include "GateVSource.hh"
+
+class G4Event;
+class GateSourceTPSPencilBeamMessenger;
+class GateSourcePencilBeam;
 
 //------------------------------------------------------------------------------------------------------
 class GateSourceTPSPencilBeam : public GateVSource
@@ -49,15 +40,23 @@ public:
 
   G4int GeneratePrimaries( G4Event* event );
   void GenerateVertex( G4Event* );
-
   //Particle Type
-  void SetParticleType(G4String ParticleType) {strcpy(mParticleType, ParticleType);}
+  void SetParticleType(G4String ParticleType) {mParticleType=ParticleType;}
+  //Particle Properties If GenericIon
+  void SetIonParameter(G4String ParticleParameters) {mParticleParameters=ParticleParameters;}
+  //Specify how to define the particle type
+  void SetIsGenericIon(bool IsGenericIon) {mIsGenericIon=IsGenericIon;}
   //Test Flag
   void SetTestFlag(bool b) {mTestFlag=b;}
-  //Treatment Plan file
-  void SetPlan(string plan) {mPlan=plan;}
+  //Flag to switch between sorted and random spot selection
+  void SetSortedSpotGenerationFlag(bool b) {mSortedSpotGenerationFlag=b;}
+  //Flag to switch between absolute (MeV) and relative (%) energy spread specification
+  void SetSigmaEnergyInMeVFlag(bool b) {mSigmaEnergyInMeVFlag=b;}
+  //Treatment Plan file (plan description file)
+  void SetPlan(G4String plan) {mPlan=plan;}
   //FlatGenerationFlag
   void SetGeneFlatFlag(bool b) {mFlatGenerationFlag=b;}
+
   //Pencil beam parameters calculation
   double GetEnergy(double energy);
   double GetSigmaEnergy(double energy);
@@ -67,63 +66,90 @@ public:
   double GetSigmaPhi(double energy);
   double GetEllipseXThetaArea(double energy);
   double GetEllipseYPhiArea(double energy);
+  double GetMonitorCalibration(double energy);
+
   //List of not allowed fields
   void SetNotAllowedField (int fieldID) {mNotAllowedFields.push_back(fieldID);}
-  // Select a single Layer
+  //List of allowed fields
   void SetAllowedField (int fieldID) {mAllowedFields.push_back(fieldID);}
-  //MU to Protons conversion
+  // Select a single Layer
   void SelectLayerID (int layerID) { mSelectedLayerID = layerID;}
-  //MU to Protons conversion
-  double ConvertMuToProtons(double weight, double energy);
+  // Select a single spot
+  void SelectSpot (int spot) { mSelectedSpot = spot;}
   //select beam descriptionfile
   void SetSourceDescriptionFile(G4String FileName){mSourceDescriptionFile=FileName; mIsASourceDescriptionFile=true;}
   //load plan description file
   void LoadClinicalBeamProperties();
   //Configuration of spot intensity
-  void SetSpotIntensity(bool b) {mSpotIntensityAsNbProtons=b;}
+  void SetSpotIntensity(bool b) {mSpotIntensityAsNbIons=b;}
   //Convergent or divergent beam model
-  void SetBeamConvergence(bool c) {mConvergentSource=c;}
+  void SetBeamConvergence(bool c) {mConvergentSourceXTheta=c; mConvergentSourceYPhi=c;}
+  void SetBeamConvergenceXTheta(bool c) {mConvergentSourceXTheta=c;}
+  void SetBeamConvergenceYPhi(bool c) {mConvergentSourceYPhi=c;}		
+  //Others
+  int GetCurrentSpotID() {return mCurrentSpot;}
+  int GetTotalNumberOfSpots() {return mTotalNumberOfSpots;}
+  int GetCurrentLayerID() {return mCurrentLayer;}
+  int GetTotalNumberOfLayers() {return mTotalNumberOfLayers;}
 
 protected:
 
+  void ConfigurePencilBeam();
   GateSourceTPSPencilBeamMessenger * pMessenger;
 
   bool mIsInitialized;
   int mCurrentSpot, mTotalNumberOfSpots;
+  int mCurrentLayer, mTotalNumberOfLayers;
+  double mTotalNbIons;
   bool mIsASourceDescriptionFile;
   G4String mSourceDescriptionFile;
 
-  vector<GateSourcePencilBeam*> mPencilBeams;
+  GateSourcePencilBeam* mPencilBeam;
   double mDistanceSMXToIsocenter;
   double mDistanceSMYToIsocenter;
   double mDistanceSourcePatient;
+
   //Particle Type
-  char mParticleType[64];
+  G4String mParticleType;
+  //Particle Properties If GenericIon
+  G4String mParticleParameters;
+  //ParticleDefinitionMethod;
+  bool mIsGenericIon;
   //Test flag (for verbosity)
   bool mTestFlag;
+
+  //generate ions sorted by spot, or randomly
+  bool mSortedSpotGenerationFlag;
+  //sigma energy definition (MeV or %)
+  bool mSigmaEnergyInMeVFlag;
   //Treatment Plan file
   G4String mPlan;
   //Others
   double mparticle_time ;
   int mCurrentParticleNumber;
-  //Distribution of the spot sources
+  //Flag for flat spot delivery
   bool mFlatGenerationFlag;
+  //Distribution of the spot sources
   double *mPDF;
   RandGeneral * mDistriGeneral;
-  //Not alloweed fields
-  vector<int> mNotAllowedFields;
+  //Disallowed fields
+  std::vector<int> mNotAllowedFields;
   //Allowed fields
-  vector<int> mAllowedFields;
+  std::vector<int> mAllowedFields;
   //clinical beam parameters (polynomial equations)
-  vector<double> mEnergy, mEnergySpread, mX, mY, mTheta, mPhi, mXThetaEmittance, mYPhiEmittance;
+  std::vector<double> mEnergy, mEnergySpread, mX, mY, mTheta, mPhi, mXThetaEmittance, mYPhiEmittance, mMonitorCalibration;
   //Configuration of spot intensity
-  bool mSpotIntensityAsNbProtons;
+  bool mSpotIntensityAsNbIons;
   //Convergent or divergent beam model
-  bool mConvergentSource;
+  bool mConvergentSourceXTheta, mConvergentSourceYPhi;
   int mSelectedLayerID;
+  int mSelectedSpot;
+  std::vector<int> mSpotLayer; //in which layer is this spot?
+  std::vector<double> mSpotEnergy;
+  std::vector<double> mSpotWeight; // (proportional to) the expected number (for each bin in a multinomial distribution)
+  std::vector<int> mNbIonsToGenerate; // the actual number (for each bin in a multinomial distribution)
+  std::vector<G4ThreeVector> mSpotPosition, mSpotRotation;
 };
 //------------------------------------------------------------------------------------------------------
-
-
-#endif
+// vim: ai sw=2 ts=2 et
 #endif

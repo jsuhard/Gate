@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -53,7 +53,7 @@ const G4String& GateObjectChildListMessenger::DumpMap()
   for (iter = Child.begin(); iter!=Child.end(); iter++) {
     theList+=iter->first;
     theList+=" ";     
-    GateMessage("Geometry", 10, " " << iter->first << G4endl;);
+    GateMessage("Geometry", 10, " " << iter->first << Gateendl;);
   }
     
   return theList;  
@@ -74,7 +74,7 @@ void GateObjectChildListMessenger::ListChoices()
   GateMessage("Geometry", 10, "The available types of child-object are: \n");
   
   for (iter = Child.begin(); iter!=Child.end(); iter++) {
-    GateMessage("Geometry", 10, " " << iter->first << G4endl;);
+    GateMessage("Geometry", 10, " " << iter->first << Gateendl;);
   }
 }
 //-----------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ void GateObjectChildListMessenger::InsertIntoCreator(const G4String& childTypeNa
     newChild = (GateVolumeManager::GetInstance()->theListOfVolumePrototypes[childTypeName](GetNewInsertionBaseName(), acceptsNewChildren, depth));
 
     // GateMessage("Core", 0, "Create child '" << newChild->GetObjectName() 
-    //                 << "' with parent '" << GetCreator()->GetObjectName() << G4endl);
+    //                 << "' with parent '" << GetCreator()->GetObjectName() << Gateendl);
     newChild->SetParentVolume(GetCreator());
 
   }

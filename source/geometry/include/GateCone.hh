@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -42,7 +42,7 @@ public:
            G4double itsRmax1, G4double itsRmax2,
            G4double itsHeight,
            G4double itsRmin1=0.,G4double itsRmin2=0.,
-           G4double itsSPhi=0., G4double itsDPhi=2*M_PI,
+           G4double itsSPhi=0., G4double itsDPhi=twopi,
            G4bool acceptsChildren=true,
            G4int depth=0);
   //! Destructor

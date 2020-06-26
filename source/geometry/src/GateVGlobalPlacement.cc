@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -98,7 +98,7 @@ void GateVGlobalPlacement::Describe(size_t indent)
   // parameters that are specific to each repeater
   DescribeMyself(indent);
     
-  G4cout << G4endl;
+  G4cout << Gateendl;
 }
 //----------------------------------------------------------------------------------------------------
 

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -29,6 +29,11 @@ GateCoincidenceSorterMessenger::GateCoincidenceSorterMessenger(GateCoincidenceSo
   windowCmd->SetGuidance("Set time-window for coincidence");
   windowCmd->SetUnitCategory("Time");
 
+  cmdName = GetDirectoryName() + "setWindowJitter";
+  windowJitterCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
+  windowJitterCmd->SetGuidance("Set standard deviation of window jitter");
+  windowJitterCmd->SetUnitCategory("Time");
+
   cmdName = GetDirectoryName() + "setOffset";
   offsetCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
   offsetCmd->SetGuidance("Set time offset for delay coincidences");
@@ -36,13 +41,8 @@ GateCoincidenceSorterMessenger::GateCoincidenceSorterMessenger(GateCoincidenceSo
 
   cmdName = GetDirectoryName() + "setOffsetJitter";
   offsetJitterCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
-  offsetJitterCmd->SetGuidance("Set time offset for delay coincidences");
+  offsetJitterCmd->SetGuidance("Set standard deviation of offset jitter");
   offsetJitterCmd->SetUnitCategory("Time");
-
-  cmdName = GetDirectoryName() + "setWindowJitter";
-  windowJitterCmd = new G4UIcmdWithADoubleAndUnit(cmdName,this);
-  windowJitterCmd->SetGuidance("Set time-window for coincidence");
-  windowJitterCmd->SetUnitCategory("Time");
 
   cmdName = GetDirectoryName()+"minSectorDifference";
   minSectorDiffCmd = new G4UIcmdWithAnInteger(cmdName.c_str(),this);
@@ -55,6 +55,12 @@ GateCoincidenceSorterMessenger::GateCoincidenceSorterMessenger(GateCoincidenceSo
   setDepthCmd->SetGuidance("Set the depth of system-level for coincidences.");
   setDepthCmd->SetParameterName("depth",false);
   setDepthCmd->SetRange("depth>=1");
+
+  cmdName = GetDirectoryName()+"setPresortBufferSize";
+  setPresortBufferSizeCmd = new G4UIcmdWithAnInteger(cmdName.c_str(),this);
+  setPresortBufferSizeCmd->SetGuidance("Set the size of the presort buffer.");
+  setPresortBufferSizeCmd->SetParameterName("size",false);
+  setPresortBufferSizeCmd->SetRange("size>=32");
 
   cmdName = GetDirectoryName()+"setInputName";
   SetInputNameCmd = new G4UIcmdWithAString(cmdName,this);
@@ -70,17 +76,26 @@ GateCoincidenceSorterMessenger::GateCoincidenceSorterMessenger(GateCoincidenceSo
   AllPulseOpenCoincGateCmd = new G4UIcmdWithABool(cmdName,this);
   AllPulseOpenCoincGateCmd->SetGuidance("Specify if a given pulse can be part of two coincs");
 
+  cmdName = GetDirectoryName()+"setTriggerOnlyByAbsorber";
+  SetTriggerOnlyByAbsorberCmd = new G4UIcmdWithABool(cmdName,this);
+  SetTriggerOnlyByAbsorberCmd->SetGuidance("Specify if only the pulses in the absorber can open a coincidencee window");
+
 }
 
 
 GateCoincidenceSorterMessenger::~GateCoincidenceSorterMessenger()
 {
-  delete windowCmd;
-  delete offsetCmd;
-  delete minSectorDiffCmd;
-  delete SetInputNameCmd;
-  delete MultiplePolicyCmd;
-  delete AllPulseOpenCoincGateCmd;
+    delete windowCmd;
+    delete offsetCmd;
+    delete windowJitterCmd;
+    delete offsetJitterCmd;
+    delete minSectorDiffCmd;
+    delete SetInputNameCmd;
+    delete MultiplePolicyCmd;
+    delete setPresortBufferSizeCmd;
+    delete AllPulseOpenCoincGateCmd;
+    delete SetTriggerOnlyByAbsorberCmd;
+
 }
 
 
@@ -98,6 +113,8 @@ void GateCoincidenceSorterMessenger::SetNewValue(G4UIcommand* aCommand, G4String
     { GetCoincidenceSorter()->SetMinSectorDifference(minSectorDiffCmd->GetNewIntValue(newValue)); }
   else if( aCommand == setDepthCmd )
     { GetCoincidenceSorter()->SetDepth(setDepthCmd->GetNewIntValue(newValue)); }
+  else if( aCommand == setPresortBufferSizeCmd )
+    { GetCoincidenceSorter()->SetPresortBufferSize(setPresortBufferSizeCmd->GetNewIntValue(newValue)); }
   else if (aCommand == SetInputNameCmd)
     {
      GetCoincidenceSorter()->SetInputName(newValue);
@@ -107,6 +124,8 @@ void GateCoincidenceSorterMessenger::SetNewValue(G4UIcommand* aCommand, G4String
     { GetCoincidenceSorter()->SetMultiplesPolicy(newValue); }
   else if (aCommand == AllPulseOpenCoincGateCmd)
     { GetCoincidenceSorter()->SetAllPulseOpenCoincGate(AllPulseOpenCoincGateCmd->GetNewBoolValue(newValue)); }
+  else if (aCommand == SetTriggerOnlyByAbsorberCmd)
+    { GetCoincidenceSorter()->SetIfTriggerOnlyByAbsorber(SetTriggerOnlyByAbsorberCmd->GetNewBoolValue(newValue));}
   else
     GateClockDependentMessenger::SetNewValue(aCommand,newValue);
 }

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -69,7 +69,7 @@ void GateUIcontrolMessenger::LaunchMacroFile(G4String fileName)
 {
   G4String filePath = GateTools::FindGateFile(fileName);
   if (filePath.empty()) {
-    G4cerr << "Could not find macro file '" << fileName << "'! Ignored!" << G4endl;
+    GateGlobalError("Could not find macro file <" << fileName << ">, execution aborted!\n");
     return;
   }
 

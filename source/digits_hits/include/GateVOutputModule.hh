@@ -3,14 +3,14 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
 #ifndef GateVOutputModule_H
 #define GateVOutputModule_H
 
-#include "GateRecorderBase.hh"
+
 #include "GateConfiguration.h"
 
 #include "globals.hh"
@@ -29,7 +29,7 @@ enum DigiMode {
   kofflineMode
 };
 
-class GateVOutputModule :  public GateRecorderBase
+class GateVOutputModule
 {
 public:
 

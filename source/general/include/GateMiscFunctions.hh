@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -19,6 +19,10 @@ See GATE/LICENSE.txt for further details
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
+#include <iterator>
+#include <exception>
+#include <typeinfo>
 
 #include "G4UIcommand.hh"
 #include "G4VSolid.hh"
@@ -26,11 +30,18 @@ See GATE/LICENSE.txt for further details
 #include "G4UnitsTable.hh"
 #include "GateMessageManager.hh"
 #include "GatePlacementQueue.hh"
+#include "G4SystemOfUnits.hh"
 
 //-----------------------------------------------------------------------------
-double rad2deg(const double anglerad);
-double deg2rad(const double angledeg);
+inline double rad2deg(const double anglerad)
+{
+  return (anglerad/CLHEP::pi*180.0);
+}
 
+inline double deg2rad(const double angledeg)
+{
+  return (angledeg*(CLHEP::pi/180.0));
+}
 //-----------------------------------------------------------------------------
 void skipComment(std::istream & is);
 
@@ -119,22 +130,22 @@ int ReadColNameAndInteger(std::istream & is, std::string name);
 
 //-----------------------------------------------------------------------------
 GatePlacement & ReadPlacement(std::istream & is,
-                              bool mUseTranslation, bool mUseRotation, 
+                              bool mUseTranslation, bool mUseRotation,
                               double translationUnit, double angleUnit);
 
 //-----------------------------------------------------------------------------
-void ReadTimePlacements(std::string filename, 
+void ReadTimePlacements(std::string filename,
                         std::vector<double> & timesList,
-                        std::vector<GatePlacement> & placementsList, 
+                        std::vector<GatePlacement> & placementsList,
                         bool & mUseRotation, bool & mUseTranslation);
 
 //-----------------------------------------------------------------------------
-void ReadTimePlacementsRepeat(std::string filename, 
+void ReadTimePlacementsRepeat(std::string filename,
                               std::vector<double> & timesList,
                               std::vector<std::vector<GatePlacement> > & listOfPlacementsList);
 
 //-----------------------------------------------------------------------------
-void ReadTimeDoubleValue(std::string filename, std::string name, 
+void ReadTimeDoubleValue(std::string filename, std::string name,
                          std::vector<double> & timesList,
                          std::vector<double> & nameList);
 
@@ -144,8 +155,31 @@ int GetIndexFromTime(std::vector<double> & mTimeList, double aTime);
 //-----------------------------------------------------------------------------
 G4String GetSaveCurrentFilename(G4String & mSaveFilename);
 
+//------------------------------------------------------------------------------------------------------
+//  try get N values of type T from a given input line
+// * throw exception with informative error message in case of trouble.
+// * NOTE that while this catches some common errors, it is not yet fool proof.
+template<typename T, int N>
+typename std::vector<T> parse_N_values_of_type_T(std::string line,int lineno, const std::string& fname);
+
+//------------------------------------------------------------------------------------------------------
+// Function to read the next content line
+// * skip all comment lines (lines string with a '#')
+// * skip empty
+// * throw exception with informative error message in case of missing data
+std::string ReadNextContentLine( std::istream& input, int& lineno, const std::string& fname );
+
+//------------------------------------------------------------------------------------------------------
+// Function to read AND parse the next content line
+// * check that we really get N values of type T from the current line
+template<typename T, int N>
+typename std::vector<T>  ParseNextContentLine( std::istream& input, int& lineno, const std::string& fname );
+
+
+//------------------------------------------------------------------------------------------------------
+// Split words separated by spaces
+void GetWords(std::vector<std::string> & words, const std::string & phrase);
 
 #include "GateMiscFunctions.icc"
 
 #endif // GATEMISCFUNCTIONS_HH
-

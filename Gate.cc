@@ -7,7 +7,7 @@
  *	- 'Gate' or 'Gate --qt' using the Qt visualization
  *	- 'Gate your_macro.mac' or 'Gate --qt your_macro.mac' using the Qt visualization
  *	- 'Gate -d your_macro.mac' using the DigiGate
- *	- 'Gate -a activity 10' using the parameterized macro creating an alias in your macro
+ *	- 'Gate -a [activity,10]' using the parameterized macro creating an alias in your macro
  */
 
 #include "G4PhysicalConstants.hh"
@@ -20,8 +20,8 @@
 
 #include "G4UImanager.hh"
 #include "G4UIterminal.hh"
+#include "GateUIterminal.hh"
 #include "G4UItcsh.hh"
-
 #include "GateRunManager.hh"
 #include "GateMessageManager.hh"
 #include "GateSteppingVerbose.hh"
@@ -39,9 +39,7 @@
 #include "GateDigitizer.hh"
 #include "GateClock.hh"
 #include "GateUIcontrolMessenger.hh"
-
 #ifdef G4ANALYSIS_USE_ROOT
-#include "GateROOTBasicOutput.hh"
 #include "TPluginManager.h"
 #include "GateHitFileReader.hh"
 #endif
@@ -50,7 +48,16 @@
 #endif
 #ifdef G4UI_USE
 #include "G4UIExecutive.hh"
+#ifdef G4UI_USE_QT
+#include "qglobal.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 0, 0))
+#include <G4UIQt.hh>
+#include <qmainwindow.h>
 #endif
+#endif
+#endif
+
+
 
 //-----------------------------------------------------------------------------
 void printHelpAndQuit( G4String msg )
@@ -150,13 +157,14 @@ void executeCommandQueue( std::queue< G4String > commandQueue, G4UImanager* UIma
 void welcome()
 {
   GateMessage("Core", 0, G4endl);
-  GateMessage("Core", 0, "**********************************************************************" << G4endl);
-  GateMessage("Core", 0, " GATE version name: gate_v7.0                                         " << G4endl);
-  GateMessage("Core", 0, "                    Copyright : OpenGATE Collaboration                " << G4endl);
-  GateMessage("Core", 0, "                    Reference : Phys. Med. Biol. 49 (2004) 4543-4561  " << G4endl);
-  GateMessage("Core", 0, "                    Reference : Phys. Med. Biol. 56 (2011) 881-901    " << G4endl);
-  GateMessage("Core", 0, "                    WWW : http://www.opengatecollaboration.org        " << G4endl);
-  GateMessage("Core", 0, "**********************************************************************" << G4endl);
+  GateMessage("Core", 0, "*************************************************" << G4endl);
+  GateMessage("Core", 0, " GATE version 9.0 (March 2020)" << G4endl);
+  GateMessage("Core", 0, " Copyright : OpenGATE Collaboration" << G4endl);
+  GateMessage("Core", 0, " Reference : Phys. Med. Biol. 49 (2004) 4543-4561" << G4endl);
+  GateMessage("Core", 0, " Reference : Phys. Med. Biol. 56 (2011) 881-901" << G4endl);
+  GateMessage("Core", 0, " Reference : Med. Phys. 41(6)    (2014)" << G4endl);
+  GateMessage("Core", 0, " http://www.opengatecollaboration.org        " << G4endl);
+  GateMessage("Core", 0, "*************************************************" << G4endl);
 #ifdef GATE_USE_GPU
   GateMessage("Core", 0, "GPU support activated" << G4endl );
 #endif
@@ -210,14 +218,14 @@ int main( int argc, char* argv[] )
       };
 
 #ifdef __APPLE__
-/*
- * If the program was started by double-clicking on the application bundle on Mac OS X
- * rather than from the command-line, enable Qt and don't try to process other options;
- * argv[1] contains a process serial number in the form -psn_0_1234567
- * OS X <= 10.8 have a -psn_XXX argument given by the system
- * OS X >= 10.9 does not have one, so we use the "TERM" environment variable
- * to distinguish between launched by the Terminal or by the system.
- */
+      /*
+       * If the program was started by double-clicking on the application bundle on Mac OS X
+       * rather than from the command-line, enable Qt and don't try to process other options;
+       * argv[1] contains a process serial number in the form -psn_0_1234567
+       * OS X <= 10.8 have a -psn_XXX argument given by the system
+       * OS X >= 10.9 does not have one, so we use the "TERM" environment variable
+       * to distinguish between launched by the Terminal or by the system.
+       */
       if ( (argc>1 && strncmp( argv[1], "-psn", 4 ) == 0) || getenv("TERM") == NULL ) {
         argc = 1;
         isQt = 1;
@@ -225,15 +233,16 @@ int main( int argc, char* argv[] )
       }
       else
 #endif
-      {
-        // Getting the option
-        c = getopt_long( argc, argv, "hva:", longOptions, &optionIndex );
-      }
+        {
+          // Getting the option
+          c = getopt_long( argc, argv, "hva:", longOptions, &optionIndex );
+        }
 
       // Exit the loop if -1
       if( c == -1 ) break;
 
       // Analyzing each option
+      std::ostringstream ss;
       switch( c )
         {
         case 0:
@@ -244,7 +253,8 @@ int main( int argc, char* argv[] )
           printHelpAndQuit("Gate command line help" );
           break;
         case 'v':
-          std::cout << "Gate version is 7.0" << std::endl;
+          ss << G4VERSION_MAJOR << "." << G4VERSION_MINOR << "." << G4VERSION_PATCH;
+          std::cout << "Gate version is 9.0 ; Geant4 version is " << ss.str() << std::endl;
           exit(0);
           break;
         case 'a':
@@ -269,12 +279,6 @@ int main( int argc, char* argv[] )
   // Construct the default run manager
   GateRunManager* runManager = new GateRunManager;
 
-  // Set the Basic ROOT Output
-  GateRecorderBase* myRecords = 0;
-#ifdef G4ANALYSIS_USE_ROOT
-  myRecords = new GateROOTBasicOutput;
-#endif
-
   // Set the DetectorConstruction
   GateDetectorConstruction* gateDC = new GateDetectorConstruction();
   runManager->SetUserInitialization( gateDC );
@@ -283,7 +287,7 @@ int main( int argc, char* argv[] )
   runManager->SetUserInitialization( GatePhysicsList::GetInstance() );
 
   // Set the users actions to handle callback for actors - before the initialisation
-  new GateUserActions( runManager, myRecords );
+  new GateUserActions( runManager);
 
   // Set the Visualization Manager
 #ifdef G4VIS_USE
@@ -324,17 +328,27 @@ int main( int argc, char* argv[] )
   G4UImanager* UImanager = G4UImanager::GetUIpointer();
 
   // Declaring pointers
+#ifdef G4UI_USE
   G4UIExecutive* ui = NULL;
+#endif
   G4UIsession* session = NULL;
   if( isQt )
     {
 #ifdef G4UI_USE
+#ifdef G4UI_USE_QT
+#if (QT_VERSION >= QT_VERSION_CHECK(4, 0, 0))
       ui = new G4UIExecutive( argc, argv );
+      G4UIQt* qui = static_cast<G4UIQt*> (UImanager->GetG4UIWindow());
+      if (qui) {
+        qui->GetMainWindow()->setVisible(true);
+      }
+#endif
+#endif
 #else
 #ifdef G4UI_USE_TCSH
-      session = new G4UIterminal( new G4UItcsh );
+      session = new GateUIterminal( new G4UItcsh );
 #else
-      session = new G4UIterminal();
+      session = new GateUIterminal();
 #endif
 #endif
 #ifndef _WIN32
@@ -344,9 +358,9 @@ int main( int argc, char* argv[] )
   else
     {
 #ifdef G4UI_USE_TCSH
-      session = new G4UIterminal( new G4UItcsh );
+      session = new GateUIterminal( new G4UItcsh );
 #else
-      session = new G4UIterminal();
+      session = new GateUIterminal();
 #endif
     }
 
@@ -384,12 +398,15 @@ int main( int argc, char* argv[] )
     GateMessage( "Core", 0, "End of macro " << macrofilename << G4endl);
   }
 
-    if (ui) // Launching interactive mode // Qt
-      {
-        ui->SessionStart();
-        delete ui;
-      }
-    else {
+#ifdef G4UI_USE
+  if (ui) // Launching interactive mode // Qt
+    {
+      ui->SessionStart();
+      delete ui;
+    }
+  else
+#endif
+    {
       if (session && !isMacroFile) { // Terminal
         session->SessionStart();
         delete session;
@@ -407,13 +424,11 @@ int main( int argc, char* argv[] )
 
   delete sourceMgr;
   delete appMgr;
-  delete UImanager;
   delete randomEngine;
   delete controlMessenger;
-#ifdef G4ANALYSIS_USE_ROOT
-  delete myRecords;
-#endif
   delete verbosity;
+
+  delete runManager;
 
   return 0;
 }

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -64,10 +64,10 @@ class GateDiffCrossSectionActor : public GateVActor
   void SetMaterial(G4String name);
   void ReadMaterialList(G4String filename);
 
-  ofstream PointerToFileDataOutSF;
-  ofstream PointerToFileDataOutFF;
-  ofstream PointerToFileDataOutDCScompton;
-  ofstream PointerToFileDataOutDCSrayleigh;
+  std::ofstream PointerToFileDataOutSF;
+  std::ofstream PointerToFileDataOutFF;
+  std::ofstream PointerToFileDataOutDCScompton;
+  std::ofstream PointerToFileDataOutDCSrayleigh;
   std::stringstream DriverDataOutSF;
   std::stringstream DriverDataOutFF;
   std::stringstream DriverDataOutDCScompton;

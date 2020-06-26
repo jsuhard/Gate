@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -53,7 +53,7 @@ class GateOutputVolumeID : public std::vector<G4int>
 };
 
 inline GateOutputVolumeID::GateOutputVolumeID(size_t itsSize)
- : std::vector<G4int>(itsSize)
+ : std::vector<G4int>(itsSize, -1)
 {}
 
 

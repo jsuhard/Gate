@@ -8,13 +8,14 @@
 
    This software is distributed under the terms
    of the GNU Lesser General  Public Licence (LGPL)
-   See GATE/LICENSE.txt for further details
+   See LICENSE.md for further details
 ----------------------*/
 
 #include <vector>
 #include <fstream>
 
 #include "GateImageCT.hh"
+#include "GateMessageManager.hh"
 
 GateImageCT::GateImageCT()
 {
@@ -59,21 +60,21 @@ void GateImageCT::Reset( std::vector<size_t>& moduleByAxis,
 
 	m_byte = m_numberOfPixel * sizeof( float );
 
-	G4cout << G4endl;
-	G4cout << "****" << G4endl;
+	G4cout << Gateendl;
+	G4cout << "****\n";
 	G4cout << "Number of Pixels in your detector : " << m_numberOfPixel
-		   << G4endl;
+		   << Gateendl;
 	G4cout << "Number of bytes by projection : "
 		   << m_byte / 1024.0
-		   << " Kb " << G4endl;
-	G4cout << "****" << G4endl;
-	G4cout << G4endl;
+		   << " Kb \n";
+	G4cout << "****\n";
+	G4cout << Gateendl;
 
 	m_data = new float[ m_numberOfPixel ];
 
 	if( !m_data )
 	{
-		G4cout << "you are in GateImageCT::Reset()" << G4endl;
+		G4cout << "you are in GateImageCT::Reset()\n";
 		G4Exception( "GateImageCT::Reset", "reset", FatalException, "Could not allocate a new image (out of memory?)" );
 	}
 }

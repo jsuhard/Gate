@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -39,7 +39,7 @@ GateObjectMoveListMessenger::GateObjectMoveListMessenger(GateObjectRepeaterList*
   //  SetObjectMoveListMess(this);
   //  SetFlagMove(false);
   
-  // G4cout << " *** Constructeur GateObjectMoveListMessenger" << " SetFlagMove(0) =  " << GetFlagMove() << G4endl;
+  // G4cout << " *** Constructeur GateObjectMoveListMessenger" << " SetFlagMove(0) =  " << GetFlagMove() << Gateendl;
   pInsertCmd->SetCandidates(DumpMap());
 }
 //------------------------------------------------------------------------------------------------
@@ -95,8 +95,8 @@ void GateObjectMoveListMessenger::ListChoices()
 void GateObjectMoveListMessenger::DoInsertion(const G4String& moveTypeName)
 {
 
-  //   G4cout << " *** GateObjectMoveListMessenger::DoInsertion " << G4endl;
-  //   G4cout << " *** moveTypeName = " << moveTypeName << G4endl;
+  //   G4cout << " *** GateObjectMoveListMessenger::DoInsertion \n";
+  //   G4cout << " *** moveTypeName = " << moveTypeName << Gateendl;
       
   if (GetNewInsertionBaseName().empty())
     SetNewInsertionBaseName(moveTypeName);

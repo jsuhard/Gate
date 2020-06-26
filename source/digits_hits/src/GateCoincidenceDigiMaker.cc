@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -60,9 +60,9 @@ void GateCoincidenceDigiMaker::Digitize()
   }
 
   if (nVerboseLevel>0) {
-      	  G4cout  << "[GateCoincidenceDigiMaker::Digitize]:  created 1 coincidence digi in this event:" <<	G4endl;
+      	  G4cout  << "[GateCoincidenceDigiMaker::Digitize]:  created 1 coincidence digi in this event:" <<	Gateendl;
 	  (*CoincidenceDigiCollection)[0]->Print();
-	  G4cout << G4endl;
+	  G4cout << Gateendl;
   }
 
 

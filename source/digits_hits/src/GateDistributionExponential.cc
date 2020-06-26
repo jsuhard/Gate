@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -65,5 +65,5 @@ void GateDistributionExponential::DescribeMyself(size_t indent)
   G4cout << GateTools::Indent(indent)
     	 <<"Lambda : "         << m_Lambda
          <<"  -- Amplitude : "<< m_Amplitude
-	 <<G4endl;
+	 << Gateendl;
 }

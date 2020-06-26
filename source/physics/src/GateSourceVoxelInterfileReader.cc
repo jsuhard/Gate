@@ -3,10 +3,12 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 #include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
+
 #include "GateRTPhantom.hh"
 #include "GateRTPhantomMgr.hh"
 #include "GateSourceVoxelInterfileReader.hh"
@@ -17,14 +19,13 @@ See GATE/LICENSE.txt for further details
 #include <stdio.h>
 #include <string.h>
 
-#include "G4PhysicalConstants.hh"
-#include "G4SystemOfUnits.hh"
-
 GateSourceVoxelInterfileReader::GateSourceVoxelInterfileReader(GateVSource* source)
   : GateVSourceVoxelReader(source), GateInterfileHeader()
 {
+  GateError("GateSourceVoxelInterfileReader is obsolete, use GateSourceVoxelImageReader instead!");
   nVerboseLevel = 0;
   m_name = G4String("interfileReader");
+  m_type = G4String("interfile");
   m_messenger = new GateSourceVoxelInterfileReaderMessenger(this);
   m_fileName  = G4String("");
   IsFirstFrame = true;
@@ -40,14 +41,21 @@ GateSourceVoxelInterfileReader::~GateSourceVoxelInterfileReader()
 void GateSourceVoxelInterfileReader::ReadFile(G4String headerFileName)
 {
   if (!m_voxelTranslator) {
-      G4cout << "GateSourceVoxelImageReader::ReadFile: ERROR : insert a translator first" << G4endl;
+      G4cout << "GateSourceVoxelInterfileReader::ReadFile: ERROR : insert a translator first\n";
       return;
   }
-  G4cout << "GateSourceVoxelImageReader::ReadFile : fileName: " <<  headerFileName << G4endl;
+  G4cout << "------------------------------------------------------------------------------------------------\n"
+         << "WARNING: Macro commands related to voxelized source description have been modified in GATE V7.1.\n"
+         << "Older ones are being deprecated and will be removed from the next release.\n"
+         << "Please, have a look at the related documentation at:\n"
+         << "http://wiki.opengatecollaboration.org/index.php/Users_Guide_V7.1:Voxelized_Source_and_Phantom\n"
+          << "------------------------------------------------------------------------------------------------\n";
+
+  G4cout << "GateSourceVoxelInterfileReader::ReadFile : fileName: " <<  headerFileName << Gateendl;
 
   ReadHeader(headerFileName);
 
-  std::vector<PixelType> buffer;
+  std::vector<DefaultPixelType> buffer;
 
   ReadData(buffer);
 
@@ -64,6 +72,7 @@ void GateSourceVoxelInterfileReader::ReadFile(G4String headerFileName)
   dz = m_planeThickness;
 
   SetVoxelSize( G4ThreeVector(dx, dy, dz) * mm );
+  SetArraySize(G4ThreeVector(nx, ny, nz));
 
   for (G4int iz=0; iz<nz; iz++) {
       for (G4int iy=0; iy<ny; iy++) {
@@ -89,10 +98,10 @@ void GateSourceVoxelInterfileReader::ReadRTFile(G4String headerFileName, G4Strin
 
   if ( Ph != 0) {
       G4cout << " The Object "<< Ph->GetName()
-	       << " is attached to the "<<m_name<<" Source Voxel Reader." << G4endl;
+	       << " is attached to the "<<m_name<<" Source Voxel Reader.\n";
   }  else {
       G4cout << " GateSourceVoxelInterfileReader::ReadFile   WARNING The Object "<< Ph->GetName()
-	       << " is not attached to any Geometry Voxel Reader."<<G4endl;
+	       << " is not attached to any Geometry Voxel Reader.\n";
   }
 
   if (!m_voxelTranslator) {
@@ -106,7 +115,7 @@ void GateSourceVoxelInterfileReader::ReadRTFile(G4String headerFileName, G4Strin
   // override filename from header
   m_dataFileName = dataFileName;
 
-  std::vector<PixelType> buffer;
+  std::vector<DefaultPixelType> buffer;
   ReadData(m_dataFileName, buffer);
 
   G4double activity;
@@ -122,6 +131,7 @@ void GateSourceVoxelInterfileReader::ReadRTFile(G4String headerFileName, G4Strin
   dz = m_planeThickness;
 
   SetVoxelSize( G4ThreeVector(dx, dy, dz) * mm );
+  SetArraySize(G4ThreeVector(nx, ny, nz));
 
   for (G4int iz=0; iz<nz; iz++) {
       for (G4int iy=0; iy<ny; iy++) {
@@ -129,7 +139,7 @@ void GateSourceVoxelInterfileReader::ReadRTFile(G4String headerFileName, G4Strin
 	      imageValue = buffer[ix+nx*iy+nx*ny*iz];
 	      activity = m_voxelTranslator->TranslateToActivity(imageValue);
 	      if (activity > 0.)
-		AddVoxel_FAST(ix, iy, iz, activity);
+	    	  AddVoxel(ix, iy, iz, activity);
 	  }
       }
   }

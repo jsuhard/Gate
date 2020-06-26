@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -29,7 +29,7 @@ void GateDistributionManual::DescribeMyself(size_t indent)
 {
   G4cout << GateTools::Indent(indent)
     	 <<"Size : "         << GetSize()
-	 <<G4endl;
+	 << Gateendl;
 }
 //___________________________________________________________________
 void GateDistributionManual::AddPoint(G4double x,G4double y)

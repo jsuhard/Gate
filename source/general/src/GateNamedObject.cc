@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -15,7 +15,7 @@ See GATE/LICENSE.txt for further details
 // Print-out a description of the object
 void GateNamedObject::Describe(size_t indent)
 {
-  G4cout << G4endl << GateTools::Indent(indent) << "GATE object:        '" << mName << "'" << G4endl;
+  G4cout << Gateendl << GateTools::Indent(indent) << "GATE object:        '" << mName << "'\n";
 }
 //----------------------------------------------------------------------------------------------------
 

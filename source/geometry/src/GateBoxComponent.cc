@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -47,8 +47,8 @@ G4bool GateBoxComponent::IsValidAttachmentRequest(GateVVolume* anCreator) const
   // Check whether the inserter is connected to a box-creator
   GateBox* boxCreator = GetBoxCreator(anCreator);
   if (!boxCreator) {
-       G4cerr   << "[" << anCreator->GetObjectName() << "::IsValidAttachmentRequest]:" << G4endl
-                << "\tThe volume creator ('" << boxCreator->GetObjectName() << "') for this inserter does not seem to be a box" << G4endl << G4endl;
+       G4cerr   << "[" << anCreator->GetObjectName() << "::IsValidAttachmentRequest]:\n"
+                << "\tThe volume creator ('" << boxCreator->GetObjectName() << "') for this inserter does not seem to be a box\n" << Gateendl;
       return false;
   }
 

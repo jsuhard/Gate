@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -52,6 +52,6 @@ GateVDigiMakerModule::~GateVDigiMakerModule()
 
 void GateVDigiMakerModule::DescribeMyself(size_t indent)
 {
-  G4cout << GateTools::Indent(indent) << "Input pulses:       " << m_inputName << G4endl;
-  G4cout << GateTools::Indent(indent) << "Output digis:       " << m_collectionName << G4endl;
+  G4cout << GateTools::Indent(indent) << "Input pulses:       " << m_inputName << Gateendl;
+  G4cout << GateTools::Indent(indent) << "Output digis:       " << m_collectionName << Gateendl;
 }

@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #include "GateRandomEngineMessenger.hh"
@@ -15,6 +15,7 @@
 #include "CLHEP/Random/Ranlux64Engine.h"
 #include <ctime>
 #include <cstdlib>
+#include <random>
 #include "GateMessageManager.hh"
 
 #ifdef G4ANALYSIS_USE_ROOT
@@ -115,25 +116,28 @@ void GateRandomEngine::ShowStatus() {
 void GateRandomEngine::Initialize() {
   bool isSeed = false;
   long seed = 0;
-  // rest bits are additionnal bit used for engine initialization
+  // rest bits are additional bit used for engine initialization
   // default engine doesn't use it
   int rest = 0;
 
   if (theSeed=="default" && theSeedFile==" ") {
     isSeed=false;
   } else if (theSeed=="auto") {
-    // initialize seed by reading from kernel random generator /dev/random
-    // FIXME may not be protable
-    FILE *hrandom = fopen("/dev/random","rb");
-    if(fread(static_cast<void*>(&seed),sizeof(seed),1,hrandom) == 0 ){G4cerr<< "Problem reading data!!!" << G4endl;}
-    if(fread(static_cast<void*>(&rest),sizeof(rest),1,hrandom) == 0 ){G4cerr<< "Problem reading data!!!" << G4endl;}
-    fclose(hrandom);
-
-    isSeed=true;
+#if __cplusplus >= 201103L
+	  std::random_device rd; //this uses /dev/urandom by default
+	  seed = rd(); // Generates a single random int
+#else
+	  // initialize seed by reading from kernel random generator /dev/urandom
+	  // FIXME may not be portable
+	  FILE *hrandom = fopen("/dev/urandom","rb");
+	  if(fread(static_cast<void*>(&seed),sizeof(seed),1,hrandom) == 0 ){G4cerr<< "Problem reading data!!!\n";}
+	  if(fread(static_cast<void*>(&rest),sizeof(rest),1,hrandom) == 0 ){G4cerr<< "Problem reading data!!!\n";}
+	  fclose(hrandom);
+#endif
+	  isSeed=true;
   } else {
-    seed = atoi(theSeed.c_str());
+    seed = atol(theSeed.c_str());
     rest = 0;
-
     isSeed=true;
   }
 
@@ -156,14 +160,14 @@ void GateRandomEngine::Initialize() {
 #endif
 
 /*
-  std::cout << "***********************************" << std::endl;
-  std::cout << "SEED " << seed << " " << (sizeof(seed)*8) << "bits REST " << rest << " " << (sizeof(rest)*8) << "bits" << std::endl;
-  std::cout << "stdrand=" << std::rand() << " stdrandom=" << random() << std::endl;
-  std::cout << "clhep=" << theRandomEngine->name() << " seed=" << theRandomEngine->getSeed() << std::endl;
+  std::cout << "***********************************\n";
+  std::cout << "SEED " << seed << " " << (sizeof(seed)*8) << "bits REST " << rest << " " << (sizeof(rest)*8) << "bits\n";
+  std::cout << "stdrand=" << std::rand() << " stdrandom=" << random() << Gateendl;
+  std::cout << "clhep=" << theRandomEngine->name() << " seed=" << theRandomEngine->getSeed() << Gateendl;
 #ifdef G4ANALYSIS_USE_ROOT
-  std::cout << "root=" << gRandom->GetName() << " seed=" << gRandom->GetSeed() << std::endl;
+  std::cout << "root=" << gRandom->GetName() << " seed=" << gRandom->GetSeed() << Gateendl;
 #endif
-  std::cout << "***********************************" << std::endl;
+  std::cout << "***********************************\n";
 */
 
   // True initialization

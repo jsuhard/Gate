@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -24,7 +24,7 @@ See GATE/LICENSE.txt for further details
 GateArrayRepeaterMessenger::GateArrayRepeaterMessenger(GateArrayRepeater* itsCubicArrayRepeater)
   :GateObjectRepeaterMessenger(itsCubicArrayRepeater)
 { 
-//    G4cout << " ***** Passage dans le constructeur de GateArrayRepeaterMessenger" << G4endl;
+//    G4cout << " ***** Passage dans le constructeur de GateArrayRepeaterMessenger\n";
     
     G4String cmdName;
 
@@ -75,11 +75,11 @@ GateArrayRepeaterMessenger::~GateArrayRepeaterMessenger()
 
 void GateArrayRepeaterMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
 { 
-//  G4cout << " Cubic array new value" << G4endl;
+//  G4cout << " Cubic array new value\n";
   
   if( command==SetRepeatVectorCmd )
     { 
-//     G4cout << " repeat number = " << SetRepeatVectorCmd->GetNew3VectorValue(newValue) << G4endl;
+//     G4cout << " repeat number = " << SetRepeatVectorCmd->GetNew3VectorValue(newValue) << Gateendl;
       
      GetCubicArrayRepeater()->SetRepeatVector(SetRepeatVectorCmd->GetNew3VectorValue(newValue));/*TellGeometryToUpdate();*/}   
   else if( command==SetRepeatNumberXCmd )

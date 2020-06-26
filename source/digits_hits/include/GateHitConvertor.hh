@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -32,6 +32,7 @@ class GateHitConvertor : public GateClockDependent
      virtual ~GateHitConvertor();
 
      virtual GatePulseList* ProcessHits(const GateCrystalHitsCollection* hitCollection);
+     virtual GatePulseList* ProcessHits(std::vector<GateCrystalHit*> vhitCollection);
      virtual void DescribeMyself(size_t indent);
 
      static  const G4String& GetOutputAlias()

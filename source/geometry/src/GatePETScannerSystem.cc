@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -20,7 +20,7 @@ GatePETScannerSystem::GatePETScannerSystem(const G4String& itsName)
 : GateScannerSystem( itsName)
 {
 
-  G4cout << " Constructeur GatePETScannerSystem " << G4endl;
+  G4cout << " Constructeur GatePETScannerSystem \n";
   // Integrate a coincidence sorter into the digitizer
   G4double coincidenceWindow = 10.* ns;
   GateDigitizer* digitizer = GateDigitizer::GetInstance();

@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -47,5 +47,5 @@ GateCoincidencePulse* GateCoincidenceMultiplesKiller::ProcessPulse(GateCoinciden
 
 void GateCoincidenceMultiplesKiller::DescribeMyself(size_t indent)
 {
-  G4cout << GateTools::Indent(indent) << "MultiplesKiller "<< G4endl;
+  G4cout << GateTools::Indent(indent) << "MultiplesKiller "<< Gateendl;
 }

@@ -1,15 +1,15 @@
 /*----------------------
-   Copyright (C): OpenGATE Collaboration
+  Copyright (C): OpenGATE Collaboration
 
-This software is distributed under the terms
-of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
-----------------------*/
+  This software is distributed under the terms
+  of the GNU Lesser General  Public Licence (LGPL)
+  See LICENSE.md for further details
+  ----------------------*/
 
 
 /*! \file
   \brief Implementation of GateVImageVolumeMessenger
- */
+*/
 #include "GateVImageVolumeMessenger.hh"
 #include "GateVImageVolume.hh"
 
@@ -17,6 +17,7 @@ See GATE/LICENSE.txt for further details
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWith3VectorAndUnit.hh"
 #include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithADouble.hh"
 
 //---------------------------------------------------------------------------
 GateVImageVolumeMessenger::GateVImageVolumeMessenger(GateVImageVolume* volume)
@@ -25,9 +26,9 @@ GateVImageVolumeMessenger::GateVImageVolumeMessenger(GateVImageVolume* volume)
   pVImageVolume(volume)
 {
 
-  GateMessage("Volume",5,"GateVImageVolumeMessenger("<<G4endl);
+  GateMessage("Volume",5,"GateVImageVolumeMessenger()\n");
   G4String dir = GetDirectoryName() + "geometry";
-  //  G4cout<<dir<<G4endl;
+  //  G4cout<<dir<< Gateendl;
 
   G4String n = dir +"/setImage";
   pImageFileNameCmd = 0;
@@ -64,6 +65,12 @@ GateVImageVolumeMessenger::GateVImageVolumeMessenger(GateVImageVolume* volume)
   pIsoCenterCmd = new G4UIcmdWith3VectorAndUnit(n,this);
   pIsoCenterCmd->SetGuidance("translate the image so that its center is at the given isocenter coordinate (given according to the 3D image coordinate, in mm)");
 
+  n = dir +"/setRotationAroundPixelIsoCenter";
+  pIsoCenterRotationFlagCmd = 0;
+  pIsoCenterRotationFlagCmd = new G4UIcmdWithABool(n,this);
+  pIsoCenterRotationFlagCmd->SetParameterName(n, false); // not omittable
+  pIsoCenterRotationFlagCmd->SetGuidance("If a rotation is applied to the volume, consider around the pixel isocenter.");
+
   n = dir +"/setOrigin";
   pSetOriginCmd = 0;
   pSetOriginCmd = new G4UIcmdWith3VectorAndUnit(n,this);
@@ -79,17 +86,30 @@ GateVImageVolumeMessenger::GateVImageVolumeMessenger(GateVImageVolume* volume)
   pBuildLabeledImageCmd = new G4UIcmdWithAString(n,this);
   pBuildLabeledImageCmd->SetGuidance("Build and dump the image labeled according to the materials list. Give the filename.");
 
+  n = dir +"/buildAndDumpDensityImage";
+  pBuildDensityImageCmd = 0;
+  pBuildDensityImageCmd = new G4UIcmdWithAString(n,this);
+  pBuildDensityImageCmd->SetGuidance("Build and dump the density image (in g/cm3) according to the materials list. Give the filename.");
+
+  n = dir +"/buildAndDumpMassImage";
+  pBuildMassImageCmd = new G4UIcmdWithAString(n,this);
+  pBuildMassImageCmd->SetGuidance("Build and dump the mass image (in g) according to the materials list. Give the filename.");
+
   n = dir +"/enableBoundingBoxOnly";
   pDoNotBuildVoxelsCmd = 0;
   pDoNotBuildVoxelsCmd = new G4UIcmdWithABool(n,this);
   pDoNotBuildVoxelsCmd->SetGuidance("Only build the bounding box (no voxels !), for visualization purpose only.");
+
+  n = dir +"/setMaxOutOfRangeFraction";
+  pSetMaxOutOfRangeFractionCmd = new G4UIcmdWithADouble(n,this);
+  pSetMaxOutOfRangeFractionCmd->SetGuidance("Maximum fraction (number between 0.0 and 1.0) of voxels that have a HU value out of the range of the materials table.");
 }
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 GateVImageVolumeMessenger::~GateVImageVolumeMessenger()
 {
-  GateMessage("Volume",5,"~GateVImageVolumeMessenger("<<G4endl);
+  GateMessage("Volume",5,"~GateVImageVolumeMessenger()\n");
 
   delete pImageFileNameCmd;
   delete pImageFileNameCmdDeprecated;
@@ -100,28 +120,32 @@ GateVImageVolumeMessenger::~GateVImageVolumeMessenger()
   delete pIsoCenterCmd;
   delete pSetOriginCmd;
   delete pBuildLabeledImageCmd;
+  delete pBuildDensityImageCmd;
+  delete pBuildMassImageCmd;
   delete pDoNotBuildVoxelsCmd;
+  delete pIsoCenterRotationFlagCmd;
+  delete pSetMaxOutOfRangeFractionCmd;
 }
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 void GateVImageVolumeMessenger::SetNewValue(G4UIcommand* command,
-					    G4String newValue)
+                                            G4String newValue)
 {
   GateMessage("Volume",5,"GateVImageVolumeMessenger::SetNewValue "
-	      << command->GetCommandPath()
-	      << " newValue=" << newValue << G4endl);
+              << command->GetCommandPath()
+              << " newValue=" << newValue << Gateendl);
 
   if (command == pImageFileNameCmd || command == pImageFileNameCmdDeprecated) {
     pVImageVolume->SetImageFilename(newValue);
-    if (command == pImageFileNameCmdDeprecated) G4cout << "### WARNING ### SetImage is obsolete and will be removed from the next release. Please use setImage" << G4endl;
+    if (command == pImageFileNameCmdDeprecated) G4cout << "### WARNING ### SetImage is obsolete and will be removed from the next release. Please use setImage\n";
   }
   else if (command == pLabelToMaterialFileNameCmd) {
     pVImageVolume->SetLabelToMaterialTableFilename(newValue);
   }
   else if (command == pHUToMaterialFileNameCmd || command == pHUToMaterialFileNameCmdDeprecated) {
     pVImageVolume->SetHUToMaterialTableFilename(newValue);
-    if (command == pHUToMaterialFileNameCmdDeprecated) G4cout << "### WARNING ### SetHUToMaterialFile is obsolete and will be removed from the next release. Please use setHUToMaterialFile" << G4endl;
+    if (command == pHUToMaterialFileNameCmdDeprecated) G4cout << "### WARNING ### SetHUToMaterialFile is obsolete and will be removed from the next release. Please use setHUToMaterialFile\n";
   }
   else if (command == pRangeMaterialFileNameCmd) {
     pVImageVolume->SetRangeMaterialTableFilename(newValue);
@@ -135,8 +159,20 @@ void GateVImageVolumeMessenger::SetNewValue(G4UIcommand* command,
   else if (command == pBuildLabeledImageCmd) {
     pVImageVolume->SetLabeledImageFilename(newValue);
   }
+  else if (command == pBuildDensityImageCmd) {
+    pVImageVolume->SetDensityImageFilename(newValue);
+  }
+  else if (command == pBuildMassImageCmd) {
+    pVImageVolume->SetMassImageFilename(newValue);
+  }
   else if (command == pDoNotBuildVoxelsCmd) {
     pVImageVolume->EnableBoundingBoxOnly(pDoNotBuildVoxelsCmd->GetNewBoolValue(newValue));
+  }
+  else if (command == pIsoCenterRotationFlagCmd) {
+    pVImageVolume->SetIsoCenterRotationFlag(pIsoCenterRotationFlagCmd->GetNewBoolValue(newValue));
+  }
+  else if ( command == pSetMaxOutOfRangeFractionCmd) {
+    pVImageVolume->SetMaxOutOfRangeFraction(pSetMaxOutOfRangeFractionCmd->GetNewDoubleValue(newValue));
   }
   // It is necessary to call GateVolumeMessenger::SetNewValue if the command
   // is not recognized

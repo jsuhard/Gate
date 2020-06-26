@@ -1,10 +1,10 @@
 /*----------------------
-   Copyright (C): OpenGATE Collaboration
+  Copyright (C): OpenGATE Collaboration
 
-This software is distributed under the terms
-of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
-----------------------*/
+  This software is distributed under the terms
+  of the GNU Lesser General  Public Licence (LGPL)
+  See LICENSE.md for further details
+  ----------------------*/
 
 #include "GateToASCIIMessenger.hh"
 #include "GateToASCII.hh"
@@ -92,8 +92,8 @@ GateToASCIIMessenger::~GateToASCIIMessenger()
   delete OutFileHitsCmd;
   delete OutFileVoxelCmd;
   delete SetFileNameCmd;
-  for (size_t i = 0; i<OutputChannelCmdList.size() ; ++i)
-    delete OutputChannelCmdList[i];
+  // for (size_t i = 0; i<OutputChannelCmdList.size() ; ++i)
+  //   delete OutputChannelCmdList[i];
 }
 //--------------------------------------------------------------------------------------------------------
 
@@ -116,7 +116,7 @@ void GateToASCIIMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
       is >> tempIntBool; // NB: is >> bool does not work, so we put is to an integer and we copy the integer to the bool
       tempBool = tempIntBool;
       maskVector.push_back(tempBool);
-      //      G4cout << "[GateToASCIIMessenger::SetNewValue] iMask: " << iMask << " maskVector[iMask]: " << maskVector[iMask] << G4endl;
+      //      G4cout << "[GateToASCIIMessenger::SetNewValue] iMask: " << iMask << " maskVector[iMask]: " << maskVector[iMask] << Gateendl;
     }
     GateCoincidenceDigi::SetCoincidenceASCIIMask( maskVector );
 
@@ -135,7 +135,7 @@ void GateToASCIIMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
       is >> tempIntBool; // NB: is >> bool does not work, so we put is to an integer and we copy the integer to the bool
       tempBool = tempIntBool;
       maskVector.push_back(tempBool);
-      //      G4cout << "[GateToASCIIMessenger::SetNewValue] iMask: " << iMask << " maskVector[iMask]: " << maskVector[iMask] << G4endl;
+      //      G4cout << "[GateToASCIIMessenger::SetNewValue] iMask: " << iMask << " maskVector[iMask]: " << maskVector[iMask] << Gateendl;
     }
     GateSingleDigi::SetSingleASCIIMask( maskVector );
 

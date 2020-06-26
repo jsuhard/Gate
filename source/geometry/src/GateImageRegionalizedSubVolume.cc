@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -28,7 +28,7 @@ GateImageRegionalizedSubVolume::GateImageRegionalizedSubVolume(const G4String& n
                                                                G4int depth)
   : GateVVolume(name,acceptsChildren,depth)
 {
-  GateMessageInc("Volume",5,"GateImageRegionalizedSubVolume() - begin"<<G4endl);
+  GateMessageInc("Volume",5,"GateImageRegionalizedSubVolume() - begin\n");
 
   //  pImage=0;
   mLabel = -1;
@@ -39,7 +39,7 @@ GateImageRegionalizedSubVolume::GateImageRegionalizedSubVolume(const G4String& n
 
  // EnableSmartVoxelOptimisation(false);
 
-  GateMessageDec("Volume",5,"GateImageRegionalizedSubVolume() - end"<<G4endl);
+  GateMessageDec("Volume",5,"GateImageRegionalizedSubVolume() - end\n");
 }
 //-----------------------------------------------------------------------------
 
@@ -48,9 +48,9 @@ GateImageRegionalizedSubVolume::GateImageRegionalizedSubVolume(const G4String& n
 /// Destructor
 GateImageRegionalizedSubVolume::~GateImageRegionalizedSubVolume()
 {
-  GateMessageInc("Volume",5,"~GateImageRegionalizedSubVolume - begin"<<G4endl);
+  GateMessageInc("Volume",5,"~GateImageRegionalizedSubVolume - begin\n");
   if (pMessenger) delete pMessenger;
-  GateMessageDec("Volume",5,"~GateImageRegionalizedSubVolume - end"<<G4endl);
+  GateMessageDec("Volume",5,"~GateImageRegionalizedSubVolume - end\n");
 }
 //-----------------------------------------------------------------------------
 

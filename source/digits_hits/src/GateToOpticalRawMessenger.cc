@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 
@@ -43,13 +43,13 @@ void GateToOpticalRawMessenger::SetNewValue(G4UIcommand* command,G4String /*newV
 {
   // All mother macro commands are overloaded to do nothing
   if( command == GetVerboseCmd() ) {
-    G4cout << "GateToOpticalRaw::VerboseCmd: Do nothing" << G4endl;
+    G4cout << "GateToOpticalRaw::VerboseCmd: Do nothing\n";
   } else if( command == GetDescribeCmd() ) {
-    G4cout << "GateToOpticalRaw::DescribeCmd: Do nothing" << G4endl;
+    G4cout << "GateToOpticalRaw::DescribeCmd: Do nothing\n";
   } else if ( command == GetEnableCmd() ) {
-    G4cout << "GateToOpticalRaw::EnableCmd: Do nothing" << G4endl;
+    G4cout << "GateToOpticalRaw::EnableCmd: Do nothing\n";
   } else if ( command == GetDisableCmd() ) {
-    G4cout << "GateToOpticalRaw::DisableCmd: Do nothing" << G4endl;
+    G4cout << "GateToOpticalRaw::DisableCmd: Do nothing\n";
   }
 /* No else anymore
   else

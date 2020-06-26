@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -24,6 +24,7 @@ public:
   enum PrefixCode {
     prefix_symbol,
     prefix_atomicnumber,
+    prefix_nucleonnumber,
     prefix_molarmass,
     prefix_density,
     prefix_state,

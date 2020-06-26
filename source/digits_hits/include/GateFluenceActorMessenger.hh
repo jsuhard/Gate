@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 /*
@@ -27,9 +27,18 @@ public:
   void SetNewValue(G4UIcommand*, G4String);
 
 protected:
+
+  G4UIcmdWithABool * pEnableSquaredCmd;
+  G4UIcmdWithABool * pEnableStepLengthCmd;
+  G4UIcmdWithABool * pEnableUncertaintyCmd;
+  G4UIcmdWithABool * pEnableNormCmd;
+  G4UIcmdWithABool * pEnableNumberOfHitsCmd;
+  G4UIcmdWithABool * pSetIgnoreWeightCmd;
   GateFluenceActor * pFluenceActor;
+  G4UIcmdWithAString * pSetResponseDetectorFileCmd;
   G4UIcmdWithABool * pEnableScatterCmd;
   G4UIcmdWithAString * pSetScatterOrderFilenameCmd;
+  G4UIcmdWithAString * pSetSeparateProcessFilenameCmd;
 };
 
 #endif /* end #define GATEFLUENCEACTORMESSENGER_HH*/

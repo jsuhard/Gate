@@ -3,7 +3,7 @@
 
   This software is distributed under the terms
   of the GNU Lesser General  Public Licence (LGPL)
-  See GATE/LICENSE.txt for further details
+  See LICENSE.md for further details
   ----------------------*/
 
 #ifndef GateWedge_h
@@ -12,7 +12,6 @@
 #include "globals.hh"
 
 #include "GateVVolume.hh"
-#include "G4RunManager.hh"
 #include "G4VVisManager.hh"
 #include "G4Trap.hh"
 #include "GateVolumeManager.hh"

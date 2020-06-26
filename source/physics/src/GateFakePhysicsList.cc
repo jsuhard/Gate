@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 
@@ -15,10 +15,12 @@ See GATE/LICENSE.txt for further details
  * \brief fGate Fake Physicslist class for development
  */
 
+#include "G4Version.hh"
 #include "GateFakePhysicsList.hh"
 
 #include "G4ProcessManager.hh"
 #include "G4ParticleTypes.hh"
+#include "GateMessageManager.hh"
 
 
 void GateFakePhysicsList::ConstructParticle()
@@ -85,7 +87,10 @@ void GateFakePhysicsList::ConstructProcess()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void GateFakePhysicsList::ConstructEM()
-{
+{ 
+#if G4VERSION_NUMBER >= 1030
+  auto theParticleIterator=GetParticleIterator();
+#endif
   theParticleIterator->reset();
   while( (*theParticleIterator)() ){
     G4ParticleDefinition* particle = theParticleIterator->value();
@@ -122,7 +127,10 @@ void GateFakePhysicsList::ConstructEM()
 void GateFakePhysicsList::ConstructGeneral()
 {
   // Add Decay Process
-   G4Decay* theDecayProcess = new G4Decay();
+  G4Decay* theDecayProcess = new G4Decay();
+#if G4VERSION_NUMBER >= 1030
+  auto theParticleIterator=GetParticleIterator();
+#endif
   theParticleIterator->reset();
   while( (*theParticleIterator)() ){
     G4ParticleDefinition* particle = theParticleIterator->value();
@@ -142,7 +150,7 @@ void GateFakePhysicsList::SetCuts()
 {
   if (verboseLevel >0){
     G4cout << "GateFakePhysicsList::SetCuts:";
-    G4cout << "CutLength : " << G4BestUnit(defaultCutValue,"Length") << G4endl;
+    G4cout << "CutLength : " << G4BestUnit(defaultCutValue,"Length") << Gateendl;
   }
 
   // set cut values for gamma at first and for e- second and next for e+,

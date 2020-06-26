@@ -3,7 +3,7 @@
 
 This software is distributed under the terms
 of the GNU Lesser General  Public Licence (LGPL)
-See GATE/LICENSE.txt for further details
+See LICENSE.md for further details
 ----------------------*/
 
 #include "GateConfiguration.h"
@@ -40,7 +40,7 @@ void GateSurfaceListMessenger::ListChoices()
   GateObjectStore* store = GateObjectStore::GetInstance();
   G4cout << "The available volumes are: \n"; 
   for (GateObjectStore::iterator p = store->begin(); p != store->end(); p++)
-  { G4cout << "  " << p->second->GetObjectName() << G4endl;}
+  { G4cout << "  " << p->second->GetObjectName() << Gateendl;}
 }
 
 void GateSurfaceListMessenger::DoInsertion(const G4String& surfaceName)
